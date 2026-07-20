@@ -1,0 +1,95 @@
+{
+  "companies": [
+    {
+      "name": "Tronox",
+      "ticker": "TROX",
+      "country": "US",
+      "website": "https://www.tronox.com",
+      "news_url": "https://www.tronox.com/category/news/",
+      "ir_url": "https://investors.tronox.com/news-releases/news-releases-details/",
+      "keywords": ["Tronox", "TROX", "Tronox TiO2", "Tronox titanium"]
+    },
+    {
+      "name": "Chemours",
+      "ticker": "CC",
+      "country": "US",
+      "website": "https://www.chemours.com",
+      "news_url": "https://www.tipure.com/en/news-events",
+      "ir_url": "https://investors.chemours.com/news-releases/news-release-details/",
+      "keywords": ["Chemours", "Ti-Pure", "Chemours TiO2", "Chemours titanium dioxide"]
+    },
+    {
+      "name": "Kronos Worldwide",
+      "ticker": "KRO",
+      "country": "US",
+      "website": "https://www.kronosww.com",
+      "news_url": "https://www.kronosww.com/press-releases/",
+      "ir_url": "https://www.kronosww.com/investors/",
+      "keywords": ["Kronos Worldwide", "KRO", "Kronos TiO2", "Kronos titanium"]
+    },
+    {
+      "name": "LB Group (Lomon Billions)",
+      "ticker": null,
+      "country": "CN",
+      "website": "https://www.lomonbillions.global",
+      "news_url": "https://www.lomonbillions.global/news/",
+      "ir_url": null,
+      "keywords": ["Lomon Billions", "LB Group", "Lomon TiO2", "Tioxide pigment"]
+    },
+    {
+      "name": "Jinan Yuxing Chemical",
+      "ticker": null,
+      "country": "CN",
+      "website": "https://www.yuxingchemical.com",
+      "news_url": null,
+      "ir_url": null,
+      "keywords": ["Jinan Yuxing", "Yuxing TiO2", "Yuxing titanium dioxide", "R818 TiO2"]
+    },
+    {
+      "name": "Henan Billions Chemicals",
+      "ticker": null,
+      "country": "CN",
+      "website": "https://www.hbbillions.com",
+      "news_url": null,
+      "ir_url": null,
+      "keywords": ["Henan Billions", "Billions Chemicals TiO2", "Henan titanium dioxide"]
+    },
+    {
+      "name": "Shandong Doguide Group",
+      "ticker": null,
+      "country": "CN",
+      "website": "https://www.doguide.com",
+      "news_url": null,
+      "ir_url": null,
+      "keywords": ["Shandong Doguide", "Doguide TiO2", "Doguide titanium", "SR-240 TiO2"]
+    }
+  ],
+  "global_keywords": [
+    "TiO2 market",
+    "titanium dioxide price",
+    "titanium dioxide antidumping",
+    "titanium dioxide regulation",
+    "TiO2 China",
+    "titanium dioxide EU"
+  ],
+  "rss_sources": [
+    {
+      "name": "PR Newswire - Chemicals",
+      "url": "https://www.prnewswire.com/rss/news-releases-list.rss",
+      "filter_keywords": ["TiO2", "titanium dioxide", "Tronox", "Chemours", "Kronos"]
+    },
+    {
+      "name": "GlobeNewsWire - Chemicals",
+      "url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Chemical/country/",
+      "filter_keywords": ["TiO2", "titanium dioxide"]
+    }
+  ],
+  "google_news_base_url": "https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en",
+  "output": {
+    "recipient_email_env": "RECIPIENT_EMAIL",
+    "sheets_history_id_env": "SHEETS_HISTORY_ID",
+    "sheets_archive_id_env": "SHEETS_ARCHIVE_ID",
+    "report_language": "bg",
+    "schedule": "Every Monday 07:00 UTC"
+  }
+}
