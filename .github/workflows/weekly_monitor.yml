@@ -1,0 +1,58 @@
+name: TiO2 Monitor — Седмичен доклад
+
+on:
+  schedule:
+    # Всеки понеделник в 07:00 UTC (= 10:00 ч. българско лятно време)
+    - cron: '0 7 * * 1'
+
+  # Позволява и ръчно стартиране от GitHub UI
+  workflow_dispatch:
+    inputs:
+      days_back:
+        description: 'Брой дни назад за търсене (по подразбиране 7)'
+        required: false
+        default: '7'
+
+jobs:
+  run-monitor:
+    name: Събиране на TiO2 новини и изпращане на доклад
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # 1. Изтегляме кода
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Настройваме Python
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # 3. Инсталираме зависимостите
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Стартираме монитора
+      - name: 🔬 Run TiO2 Monitor
+        env:
+          ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_USER:               ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:       ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL:          ${{ secrets.RECIPIENT_EMAIL }}
+          GOOGLE_CREDENTIALS_JSON:  ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          SHEETS_HISTORY_ID:        ${{ secrets.SHEETS_HISTORY_ID }}
+          SHEETS_ARCHIVE_ID:        ${{ secrets.SHEETS_ARCHIVE_ID }}
+          DAYS_BACK:                ${{ github.event.inputs.days_back || '7' }}
+        run: python src/main.py
+
+      # 5. При грешка — запазваме лога
+      - name: 📋 Upload log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-log-${{ github.run_id }}
+          path: '*.log'
+          retention-days: 7
