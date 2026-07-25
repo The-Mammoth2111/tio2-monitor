@@ -112,6 +112,23 @@
         "Zakłady Chemiczne Police",
         "PCE Warsaw"
       ]
+    },
+    {
+      "name": "Precheza (PRETIOX)",
+      "ticker": null,
+      "exchange": null,
+      "listed": false,
+      "owner": "Agrofert (частна)",
+      "country": "CZ",
+      "website": "https://www.precheza.cz",
+      "news_url": "https://www.precheza.cz/en/news-and-media/news/",
+      "ir_url": null,
+      "keywords": [
+        "Precheza TiO2",
+        "PRETIOX titanium dioxide",
+        "Precheza Přerov",
+        "Precheza pigment"
+      ]
     }
   ],
   "global_keywords": [
