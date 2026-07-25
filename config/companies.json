@@ -7,7 +7,12 @@
       "website": "https://www.tronox.com",
       "news_url": "https://www.tronox.com/category/news/",
       "ir_url": "https://investors.tronox.com/news-releases/news-releases-details/",
-      "keywords": ["Tronox", "TROX", "Tronox TiO2", "Tronox titanium"]
+      "keywords": [
+        "Tronox",
+        "TROX",
+        "Tronox TiO2",
+        "Tronox titanium"
+      ]
     },
     {
       "name": "Chemours",
@@ -16,7 +21,12 @@
       "website": "https://www.chemours.com",
       "news_url": "https://www.tipure.com/en/news-events",
       "ir_url": "https://investors.chemours.com/news-releases/news-release-details/",
-      "keywords": ["Chemours", "Ti-Pure", "Chemours TiO2", "Chemours titanium dioxide"]
+      "keywords": [
+        "Chemours",
+        "Ti-Pure",
+        "Chemours TiO2",
+        "Chemours titanium dioxide"
+      ]
     },
     {
       "name": "Kronos Worldwide",
@@ -25,7 +35,12 @@
       "website": "https://www.kronosww.com",
       "news_url": "https://www.kronosww.com/press-releases/",
       "ir_url": "https://www.kronosww.com/investors/",
-      "keywords": ["Kronos Worldwide", "KRO", "Kronos TiO2", "Kronos titanium"]
+      "keywords": [
+        "Kronos Worldwide",
+        "KRO",
+        "Kronos TiO2",
+        "Kronos titanium"
+      ]
     },
     {
       "name": "LB Group (Lomon Billions)",
@@ -34,7 +49,12 @@
       "website": "https://www.lomonbillions.global",
       "news_url": "https://www.lomonbillions.global/news/",
       "ir_url": null,
-      "keywords": ["Lomon Billions", "LB Group", "Lomon TiO2", "Tioxide pigment"]
+      "keywords": [
+        "Lomon Billions",
+        "LB Group",
+        "Lomon TiO2",
+        "Tioxide pigment"
+      ]
     },
     {
       "name": "Jinan Yuxing Chemical",
@@ -43,7 +63,12 @@
       "website": "https://www.yuxingchemical.com",
       "news_url": null,
       "ir_url": null,
-      "keywords": ["Jinan Yuxing", "Yuxing TiO2", "Yuxing titanium dioxide", "R818 TiO2"]
+      "keywords": [
+        "Jinan Yuxing",
+        "Yuxing TiO2",
+        "Yuxing titanium dioxide",
+        "R818 TiO2"
+      ]
     },
     {
       "name": "Henan Billions Chemicals",
@@ -52,7 +77,11 @@
       "website": "https://www.hbbillions.com",
       "news_url": null,
       "ir_url": null,
-      "keywords": ["Henan Billions", "Billions Chemicals TiO2", "Henan titanium dioxide"]
+      "keywords": [
+        "Henan Billions",
+        "Billions Chemicals TiO2",
+        "Henan titanium dioxide"
+      ]
     },
     {
       "name": "Shandong Doguide Group",
@@ -61,7 +90,28 @@
       "website": "https://www.doguide.com",
       "news_url": null,
       "ir_url": null,
-      "keywords": ["Shandong Doguide", "Doguide TiO2", "Doguide titanium", "SR-240 TiO2"]
+      "keywords": [
+        "Shandong Doguide",
+        "Doguide TiO2",
+        "Doguide titanium",
+        "SR-240 TiO2"
+      ]
+    },
+    {
+      "name": "Grupa Azoty Police (TYTANPOL)",
+      "ticker": "PCE",
+      "exchange": "WSE",
+      "country": "PL",
+      "website": "https://zchpolice.grupaazoty.com",
+      "news_url": "https://tytanpol.com/en/news/",
+      "ir_url": "https://zchpolice.grupaazoty.com/en/investor-relations",
+      "keywords": [
+        "Grupa Azoty Police",
+        "TYTANPOL",
+        "Police TiO2",
+        "Zakłady Chemiczne Police",
+        "PCE Warsaw"
+      ]
     }
   ],
   "global_keywords": [
@@ -76,12 +126,21 @@
     {
       "name": "PR Newswire - Chemicals",
       "url": "https://www.prnewswire.com/rss/news-releases-list.rss",
-      "filter_keywords": ["TiO2", "titanium dioxide", "Tronox", "Chemours", "Kronos"]
+      "filter_keywords": [
+        "TiO2",
+        "titanium dioxide",
+        "Tronox",
+        "Chemours",
+        "Kronos"
+      ]
     },
     {
       "name": "GlobeNewsWire - Chemicals",
       "url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Chemical/country/",
-      "filter_keywords": ["TiO2", "titanium dioxide"]
+      "filter_keywords": [
+        "TiO2",
+        "titanium dioxide"
+      ]
     }
   ],
   "google_news_base_url": "https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en",
