@@ -129,6 +129,42 @@
         "Precheza Přerov",
         "Precheza pigment"
       ]
+    },
+    {
+      "name": "Indorama Advanced Oxides (Huelva)",
+      "ticker": null,
+      "exchange": null,
+      "listed": false,
+      "owner": "Indorama Corporation (частна, Сингапур/Тайланд)",
+      "country": "ES",
+      "website": "https://www.indorama.com",
+      "news_url": "https://www.indorama.com/news/",
+      "ir_url": null,
+      "notes": "Придобит от Venator Spain март 2026. Завод Huelva, 80,000 т/год. Първо влизане на Indorama в TiO₂.",
+      "keywords": [
+        "Indorama TiO2",
+        "Indorama Advanced Oxides",
+        "Indorama Huelva titanium dioxide",
+        "Indorama Venator Spain"
+      ]
+    },
+    {
+      "name": "INEOS Pigments (Ashtabula)",
+      "ticker": null,
+      "exchange": null,
+      "listed": false,
+      "owner": "INEOS Group (частна, Jim Ratcliffe)",
+      "country": "US",
+      "website": "https://www.ineos.com/businesses/ineos-enterprises/businesses/ineos-pigments/",
+      "news_url": "https://www.ineos.com/news/",
+      "ir_url": null,
+      "notes": "Ashtabula Complex, Охайо, САЩ. TiO₂ пигменти + титанови химикали (TiCl4, TiOCl2). Придобит от Tronox/Cristal за $700M. Втори в Северна Америка.",
+      "keywords": [
+        "INEOS Pigments TiO2",
+        "INEOS titanium dioxide Ashtabula",
+        "INEOS pigments news",
+        "INEOS TiO2 2026"
+      ]
     }
   ],
   "global_keywords": [
