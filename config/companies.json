@@ -150,5 +150,55 @@
     "sheets_archive_id_env": "SHEETS_ARCHIVE_ID",
     "report_language": "bg",
     "schedule": "Every Monday 07:00 UTC"
-  }
+  },
+  "commodities": [
+    {
+      "name": "Сяра (Elemental Sulfur)",
+      "relevance": "Суровина за сярна киселина → сулфатен метод TiO₂ (Police, Kronos)",
+      "benchmark": "Tampa, FL contract price",
+      "unit": "USD/long ton",
+      "keywords": [
+        "sulfur price 2026",
+        "elemental sulfur Tampa price",
+        "sulfur market outlook",
+        "сяра цена"
+      ],
+      "sources": [
+        "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-sulfur.pdf",
+        "https://www.icis.com/explore/resources/news/chemical-news/sulfur/"
+      ]
+    },
+    {
+      "name": "Сярна киселина (Sulfuric Acid H₂SO₄)",
+      "relevance": "Директна суровина в сулфатния процес за TiO₂ производство",
+      "benchmark": "OTC — следи се от ICIS, Chemanalyst, IMARC",
+      "unit": "USD/MT",
+      "keywords": [
+        "sulfuric acid price 2026",
+        "sulfuric acid Europe price",
+        "H2SO4 market price",
+        "сярна киселина цена"
+      ],
+      "sources": [
+        "https://www.icis.com/explore/resources/news/chemical-news/sulphuric-acid/",
+        "https://www.chemanalyst.com/Pricing-data/sulphuric-acid-70",
+        "https://www.imarcgroup.com/sulphuric-acid-pricing-report"
+      ]
+    },
+    {
+      "name": "Илменит / Рутил (TiO₂ Feedstock)",
+      "relevance": "Основна минерална суровина за производство на TiO₂",
+      "benchmark": "OTC — следи се от TZMI, Wood Mackenzie",
+      "unit": "USD/MT",
+      "keywords": [
+        "ilmenite price 2026",
+        "rutile price 2026",
+        "titanium feedstock market",
+        "TiO2 feedstock outlook"
+      ],
+      "sources": [
+        "https://www.icis.com/explore/resources/news/chemical-news/titanium-dioxide/"
+      ]
+    }
+  ]
 }
