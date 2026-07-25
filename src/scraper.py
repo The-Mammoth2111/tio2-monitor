@@ -297,5 +297,30 @@ def scrape_all(days_back: int = 7) -> list[dict]:
         all_articles.extend(arts)
         time.sleep(1)
 
+    # ── Суровини ──
+    logger.info("📡 Цени на суровини (сяра, сярна киселина, илменит)...")
+    commodity_arts = fetch_commodity_prices(config, days_back)
+    all_articles.extend(commodity_arts)
+
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
+
+
+# ─────────────────────────────────────────────
+# 5. Суровини — Сяра, Сярна киселина, Илменит
+# ─────────────────────────────────────────────
+
+def fetch_commodity_prices(config: dict, days_back: int) -> list[dict]:
+    """
+    Търси новини за цените на ключовите суровини:
+    сяра, сярна киселина, илменит/рутил.
+    """
+    articles = []
+    for commodity in config.get("commodities", []):
+        name = commodity["name"]
+        for keyword in commodity.get("keywords", []):
+            arts = fetch_google_news(keyword, name, "Суровини", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+    logger.info(f"  Суровини: {len(articles)} статии намерени")
+    return articles
