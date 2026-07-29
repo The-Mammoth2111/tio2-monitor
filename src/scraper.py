@@ -302,6 +302,11 @@ def scrape_all(days_back: int = 7) -> list[dict]:
     commodity_arts = fetch_commodity_prices(config, days_back)
     all_articles.extend(commodity_arts)
 
+    # ── Макроикономически индикатори ──
+    logger.info("📡 Лихвени проценти (Fed, ECB, BOJ, PBOC)...")
+    macro_arts = fetch_macro_indicators(config, days_back)
+    all_articles.extend(macro_arts)
+
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
 
@@ -323,4 +328,26 @@ def fetch_commodity_prices(config: dict, days_back: int) -> list[dict]:
             articles.extend(arts)
             time.sleep(0.4)
     logger.info(f"  Суровини: {len(articles)} статии намерени")
+    return articles
+
+
+# ─────────────────────────────────────────────
+# 6. Макроикономически индикатори — Лихвени проценти
+# ─────────────────────────────────────────────
+
+def fetch_macro_indicators(config: dict, days_back: int) -> list[dict]:
+    """
+    Търси новини за лихвените проценти на Fed, ECB, BOJ и PBOC.
+    Лихвите влияят пряко на строителство, автомобилен сектор и
+    потребление на бои — основните пазари за TiO₂.
+    """
+    articles = []
+    for indicator in config.get("macro_indicators", []):
+        name = indicator["name"]
+        region = indicator.get("region", "")
+        for keyword in indicator.get("keywords", []):
+            arts = fetch_google_news(keyword, f"{region} {name}", "Макро", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+    logger.info(f"  Макро индикатори: {len(articles)} статии намерени")
     return articles
