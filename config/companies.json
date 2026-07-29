@@ -43,18 +43,24 @@
       ]
     },
     {
-      "name": "LB Group (Lomon Billions)",
-      "ticker": null,
+      "name": "LB Group (Lomon Billions / ex-Henan Billions)",
+      "ticker": "002601",
       "country": "CN",
       "website": "https://www.lomonbillions.global",
       "news_url": "https://www.lomonbillions.global/news/",
       "ir_url": null,
       "keywords": [
+        "LB Group TiO2",
         "Lomon Billions",
-        "LB Group",
-        "Lomon TiO2",
-        "Tioxide pigment"
-      ]
+        "Henan Billions",
+        "BILLIONS TiO2 pigment",
+        "LB Group Tioxide",
+        "LB Group Greatham",
+        "002601 titanium"
+      ],
+      "exchange": "Shenzhen Stock Exchange",
+      "listed": true,
+      "notes": "Създадена 2016: сливане на Henan Billions + Sichuan Lomon. Ребранд на Lomon Billions → LB Group юли 2021. Придоби Venator Greatham (UK) април 2026 → нова дъщерна Tioxide."
     },
     {
       "name": "Jinan Yuxing Chemical",
@@ -68,19 +74,6 @@
         "Yuxing TiO2",
         "Yuxing titanium dioxide",
         "R818 TiO2"
-      ]
-    },
-    {
-      "name": "Henan Billions Chemicals",
-      "ticker": null,
-      "country": "CN",
-      "website": "https://www.hbbillions.com",
-      "news_url": null,
-      "ir_url": null,
-      "keywords": [
-        "Henan Billions",
-        "Billions Chemicals TiO2",
-        "Henan titanium dioxide"
       ]
     },
     {
