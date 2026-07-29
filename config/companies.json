@@ -574,12 +574,15 @@
     "monitored_jurisdictions": [
       "ЕС",
       "САЩ",
+      "Великобритания",
+      "Австралия",
       "Бразилия",
       "Индия",
       "Турция",
       "Саудитска Арабия",
       "Мексико",
-      "Египет"
+      "Египет",
+      "Евразийски икономически съюз"
     ],
     "keywords": [
       "TiO2 antidumping investigation initiated",
@@ -597,6 +600,275 @@
     "sources": [
       "https://policy.trade.ec.europa.eu/enforcement-and-protection/trade-defence_en",
       "https://www.trade.gov/data-visualization/adcvd-proceedings"
+    ]
+  },
+  "acid_allocation": {
+    "priority": "КРИТИЧЕН — проблемът е ДОСТЪПЪТ, не само цената",
+    "insight": "TiO₂ е само 4.2% от световното потребление на H₂SO₄ (9.4% в Китай), докато торовете са ~60%. При недостиг торовете се приоритизират и TiO₂ производителите просто НЕ ПОЛУЧАВАТ киселина.",
+    "consumption_split_global": {
+      "fertilizers": 59.6,
+      "chemical_uses": 19.2,
+      "industrial": 9.9,
+      "titanium_dioxide": 4.2,
+      "other": 7.1
+    },
+    "consumption_split_china": {
+      "fertilizers": 60.0,
+      "chemical": 11.4,
+      "industrial": 10.8,
+      "titanium_dioxide": 9.4,
+      "other": 8.4
+    },
+    "china_total_kmt": 106277,
+    "watch_signals": [
+      "Приоритизиране на торове пред TiO₂",
+      "Забрана/ограничение за износ на H₂SO₄",
+      "Съобщения за недостиг (не само поскъпване)",
+      "Спиране на TiO₂ линии поради липса на киселина"
+    ],
+    "keywords": [
+      "sulfuric acid allocation shortage TiO2",
+      "sulphuric acid supply constraint titanium dioxide",
+      "fertilizer priority sulfuric acid allocation",
+      "H2SO4 availability chemical industry 2026",
+      "sulfuric acid rationing"
+    ]
+  },
+  "operating_rates": {
+    "priority": "ВИСОК — опреждащ индикатор за предлагането",
+    "insight": "По-точен сигнал от ценовите новини. Спад под 60% предвещава ценови скок 1-2 месеца напред.",
+    "region": "Китай (55-65% от световния капацитет)",
+    "historical": [
+      {
+        "period": "2025-02",
+        "rate": 76
+      },
+      {
+        "period": "2025-06",
+        "rate": 58
+      },
+      {
+        "period": "2025-09",
+        "rate": 74
+      },
+      {
+        "period": "2025-12",
+        "rate": 72
+      },
+      {
+        "period": "2026-02",
+        "rate": 65
+      },
+      {
+        "period": "2026-04",
+        "rate": 66
+      }
+    ],
+    "thresholds": {
+      "critical_low": 60,
+      "normal": 70,
+      "high": 76
+    },
+    "keywords": [
+      "China TiO2 operating rate 2026",
+      "titanium dioxide capacity utilization China",
+      "Chinese TiO2 production run rate",
+      "TiO2 plant utilization rate"
+    ]
+  },
+  "margin_tracker": {
+    "priority": "ВИСОК — количествено измерва издръжливостта",
+    "insight": "Китайците губят -¥3,550/тон (-$521/тон). Това казва КОЛКО ДЪЛГО могат да издържат преди вълна от спирания → ценови обрат.",
+    "current_china_loss_cny_mt": -3550,
+    "current_china_loss_usd_mt": -521,
+    "reference_prices_20apr2026": [
+      {
+        "index": "SCI99 +VAT",
+        "cny": 16780,
+        "usd": 2461
+      },
+      {
+        "index": "Ferro +VAT",
+        "cny": 16429,
+        "usd": 2410
+      },
+      {
+        "index": "SunSirs Spot",
+        "cny": 16400,
+        "usd": 2406
+      },
+      {
+        "index": "TDD Index",
+        "cny": 16010,
+        "usd": 2348
+      }
+    ],
+    "sulfur_ratio": "~1 тон сяра ИЛИ 3 тона H₂SO₄ на тон TiO₂ (сулфатен процес)",
+    "keywords": [
+      "China TiO2 producer margin loss 2026",
+      "titanium dioxide production cost China",
+      "TiO2 cash cost margin squeeze",
+      "SCI99 TiO2 price index"
+    ]
+  },
+  "export_restrictions": {
+    "priority": "ВИСОК — механизъм, различен от антидъмпинга",
+    "insight": "Китай ЗАБРАНИ износа на сярна киселина и ограничи торовете за остатъка от 2026. Това е експортен контрол на СУРОВИНА, не търговска защита на продукт.",
+    "active": [
+      {
+        "country": "Китай",
+        "item": "Сярна киселина",
+        "type": "Забрана за износ",
+        "period": "остатък от 2026",
+        "impact": "Ограничава TiO₂ производството извън Китай"
+      },
+      {
+        "country": "Китай",
+        "item": "Торове",
+        "type": "Ограничение",
+        "period": "остатък от 2026"
+      },
+      {
+        "country": "Китай",
+        "item": "249 продукта",
+        "type": "Премахнати данъчни облекчения",
+        "period": "от 1 април 2026"
+      }
+    ],
+    "keywords": [
+      "China sulfuric acid export ban 2026",
+      "China export restriction chemicals fertilizer",
+      "export control sulphuric acid",
+      "China export quota chemicals 2026"
+    ]
+  },
+  "unplanned_outages": {
+    "priority": "ВИСОК — движи спот-цените веднага",
+    "insight": "Различни от обявените затваряния. Force majeure, стачки, време, аварии — имат незабавен ефект върху наличността.",
+    "recent_events": [
+      {
+        "company": "Kronos",
+        "site": "Leverkusen (DE)",
+        "event": "Downtime Q1 2026, ускорена редукция на запасите",
+        "type": "Планиран престой"
+      },
+      {
+        "company": "INEOS",
+        "site": "Ashtabula (US)",
+        "event": "Екстремно време Q1 + индустриални действия (стачки) Q2 2026",
+        "type": "Force majeure / Стачка"
+      },
+      {
+        "company": "Chemours",
+        "site": "—",
+        "event": "Производство под исторически нива, проблеми с наличност в пластмасовия пазар",
+        "type": "Ограничена наличност"
+      },
+      {
+        "company": "Японски производители",
+        "site": "Япония",
+        "event": "Производството намалено след затваряния",
+        "type": "Структурно"
+      }
+    ],
+    "keywords": [
+      "TiO2 plant force majeure 2026",
+      "titanium dioxide production disruption strike",
+      "TiO2 unplanned outage supply",
+      "pigment plant shutdown unplanned",
+      "TiO2 industrial action strike"
+    ]
+  },
+  "addressable_markets": {
+    "priority": "СРЕДЕН — референтна таблица за пренасочване на обеми",
+    "insight": "Позволява да се изчисли НАКЪДЕ отиват китайските обеми при всяко ново мито и кои пазари се насищат.",
+    "unit": "kmt/year",
+    "regions": [
+      {
+        "region": "Европа",
+        "size_kmt": 1000,
+        "china_status": "Мита в сила ($290-860/mt, мин. 5 г.) — внос ↓~50%"
+      },
+      {
+        "region": "Северна Америка",
+        "size_kmt": 1000,
+        "china_status": "35% мито общо — китайски дял <2%"
+      },
+      {
+        "region": "ЮИ Азия",
+        "size_kmt": 480,
+        "china_status": "НАСИТЕН — основна цел за пренасочване"
+      },
+      {
+        "region": "Южна Америка",
+        "size_kmt": 180,
+        "china_status": "Бразилия: мита $1,160-1,270/mt — внос ↓>65%"
+      },
+      {
+        "region": "Великобритания",
+        "size_kmt": 90,
+        "china_status": "Разследване инициирано 3 март 2026"
+      },
+      {
+        "region": "Африка",
+        "size_kmt": 60,
+        "china_status": "Отворен"
+      },
+      {
+        "region": "Австралия",
+        "size_kmt": 46,
+        "china_status": "Разследване инициирано 30 април 2026"
+      }
+    ],
+    "trade_barriers_summary": [
+      {
+        "jurisdiction": "ЕС",
+        "duties": "$290-860/mt",
+        "status": "В сила мин. 5 г.",
+        "impact": "Внос ↓~50%"
+      },
+      {
+        "jurisdiction": "САЩ",
+        "duties": "35% (25% §301 + 10% YTD)",
+        "status": "В сила",
+        "impact": "Китайски дял <2%"
+      },
+      {
+        "jurisdiction": "Бразилия",
+        "duties": "$1,160-1,270/mt",
+        "status": "В сила",
+        "impact": "Внос ↓>65%"
+      },
+      {
+        "jurisdiction": "Индия",
+        "duties": "20-30% ($460-680/mt) + 10% данък",
+        "status": "ПАУЗИРАНИ от 8 дек 2025",
+        "impact": "Внос ↓60% Q1/Q2"
+      },
+      {
+        "jurisdiction": "Саудитска Арабия",
+        "duties": "19-45% ($430-1,170/mt)",
+        "status": "Финални окт. 2025",
+        "impact": "Внос ↓70%"
+      },
+      {
+        "jurisdiction": "Великобритания",
+        "duties": "—",
+        "status": "РАЗСЛЕДВАНЕ от 3 март 2026",
+        "impact": "Очаква се"
+      },
+      {
+        "jurisdiction": "Австралия",
+        "duties": "—",
+        "status": "РАЗСЛЕДВАНЕ от 30 април 2026",
+        "impact": "Очаква се"
+      },
+      {
+        "jurisdiction": "Евразийски икон. съюз",
+        "duties": "—",
+        "status": "Активен",
+        "impact": "—"
+      }
     ]
   }
 }
