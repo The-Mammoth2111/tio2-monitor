@@ -332,6 +332,26 @@ def scrape_all(days_back: int = 7) -> list[dict]:
     logger.info("📡 Търговски разследвания (ранни сигнали)...")
     all_articles.extend(fetch_trade_investigations(config, days_back))
 
+    # ── 6. Алокация на сярна киселина (КРИТИЧНО) ──
+    logger.info("📡 Алокация на H₂SO₄ — достъп, не само цена...")
+    all_articles.extend(fetch_acid_allocation(config, days_back))
+
+    # ── 7. Оперативни нива ──
+    logger.info("📡 Оперативни нива на китайските заводи...")
+    all_articles.extend(fetch_operating_rates(config, days_back))
+
+    # ── 8. Маржове и себестойност ──
+    logger.info("📡 Маржове и себестойност...")
+    all_articles.extend(fetch_margins(config, days_back))
+
+    # ── 9. Експортни ограничения ──
+    logger.info("📡 Експортни ограничения (не вносни мита)...")
+    all_articles.extend(fetch_export_restrictions(config, days_back))
+
+    # ── 10. Непланирани прекъсвания ──
+    logger.info("📡 Force majeure, стачки, аварии...")
+    all_articles.extend(fetch_unplanned_outages(config, days_back))
+
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
 
@@ -552,4 +572,111 @@ def fetch_trade_investigations(config: dict, days_back: int) -> list[dict]:
         time.sleep(0.3)
 
     logger.info(f"  Търговски разследвания: {len(articles)} статии")
+    return articles
+
+
+# ═════════════════════════════════════════════
+#  ФАКТОРИ ОТ TRONOX Q2 2026 MARKET UPDATE
+# ═════════════════════════════════════════════
+
+# ── 6. АЛОКАЦИЯ НА СЯРНА КИСЕЛИНА ────────────
+
+def fetch_acid_allocation(config: dict, days_back: int) -> list[dict]:
+    """
+    Достъпът до H₂SO₄, не само цената.
+
+    TiO₂ е едва 4.2% от световното потребление на сярна киселина
+    (9.4% в Китай), докато торовете са ~60%. При недостиг торовете
+    се приоритизират и TiO₂ производителите просто НЕ ПОЛУЧАВАТ
+    киселина — производството спира независимо от цената.
+    """
+    alloc = config.get("acid_allocation", {})
+    articles = []
+    for keyword in alloc.get("keywords", []):
+        articles.extend(fetch_google_news(keyword, "Алокация H₂SO₄", "Алокация", days_back))
+        time.sleep(0.4)
+    logger.info(f"  Алокация H₂SO₄: {len(articles)} статии")
+    return articles
+
+
+# ── 7. ОПЕРАТИВНИ НИВА ───────────────────────
+
+def fetch_operating_rates(config: dict, days_back: int) -> list[dict]:
+    """
+    Натоварване на китайските заводи — опреждащ индикатор.
+
+    По-точен сигнал от ценовите новини. Историческа крива:
+    76% → 58% → 74% → 72% → 65% → 66%.
+    Спад под 60% предвещава ценови скок 1-2 месеца напред.
+    """
+    rates = config.get("operating_rates", {})
+    articles = []
+    for keyword in rates.get("keywords", []):
+        articles.extend(fetch_google_news(keyword, "Оперативни нива", "ОперНива", days_back))
+        time.sleep(0.4)
+    logger.info(f"  Оперативни нива: {len(articles)} статии")
+    return articles
+
+
+# ── 8. МАРЖОВЕ И СЕБЕСТОЙНОСТ ────────────────
+
+def fetch_margins(config: dict, days_back: int) -> list[dict]:
+    """
+    Колко дълго китайците могат да издържат.
+
+    Текуща загуба: -¥3,550/тон (-$521/тон). Когато загубата стане
+    непоносима → вълна от спирания → ценови обрат. Това е
+    количествено измерение на издръжливостта.
+    """
+    margins = config.get("margin_tracker", {})
+    articles = []
+    for keyword in margins.get("keywords", []):
+        articles.extend(fetch_google_news(keyword, "Маржове", "Маржове", days_back))
+        time.sleep(0.4)
+    logger.info(f"  Маржове: {len(articles)} статии")
+    return articles
+
+
+# ── 9. ЕКСПОРТНИ ОГРАНИЧЕНИЯ ─────────────────
+
+def fetch_export_restrictions(config: dict, days_back: int) -> list[dict]:
+    """
+    Експортен контрол — различен механизъм от антидъмпинга.
+
+    Китай забрани износа на сярна киселина и ограничи торовете
+    за остатъка от 2026. Това е контрол върху СУРОВИНА, не
+    търговска защита на продукт — засяга производството навсякъде.
+    """
+    restrictions = config.get("export_restrictions", {})
+    articles = []
+    for keyword in restrictions.get("keywords", []):
+        articles.extend(fetch_google_news(keyword, "Експортни ограничения", "ЕкспОгр", days_back))
+        time.sleep(0.4)
+    logger.info(f"  Експортни ограничения: {len(articles)} статии")
+    return articles
+
+
+# ── 10. НЕПЛАНИРАНИ ПРЕКЪСВАНИЯ ──────────────
+
+def fetch_unplanned_outages(config: dict, days_back: int) -> list[dict]:
+    """
+    Force majeure, стачки, аварии, време.
+
+    Различни от обявените затваряния — движат спот-цените ВЕДНАГА.
+    Примери: INEOS стачка Q2, Kronos Leverkusen downtime,
+    Chemours ограничена наличност в пластмаси.
+    """
+    outages = config.get("unplanned_outages", {})
+    articles = []
+    for keyword in outages.get("keywords", []):
+        articles.extend(fetch_google_news(keyword, "Прекъсвания", "Прекъсвания", days_back))
+        time.sleep(0.4)
+
+    # Търсене по компания за force majeure
+    for company in config.get("companies", []):
+        query = f"{company['name']} force majeure production disruption 2026"
+        articles.extend(fetch_google_news(query, f"Прекъсване — {company['name']}", "Прекъсвания", days_back))
+        time.sleep(0.3)
+
+    logger.info(f"  Прекъсвания: {len(articles)} статии")
     return articles
