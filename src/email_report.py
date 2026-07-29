@@ -41,6 +41,7 @@ def _type_badge(article_type: str) -> str:
         "Новини":      ("badge-news",  "Новини"),
         "Суровини":    ("badge-comm",  "Суровини"),
         "Макро":       ("badge-macro", "Макро"),
+        "Валути":      ("badge-fx",    "Валути"),
     }
     cls, label = colors.get(article_type, ("badge-news", article_type))
     return f'<span class="badge {cls}">{label}</span>'
@@ -132,7 +133,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
     for company, arts in grouped.items():
         if company not in company_order and company != "ОБЩИ" and arts:
             # Пропускаме суровини и макро — те имат свои секции
-            if all(a.get('type') in ('Суровини', 'Макро') for a in arts):
+            if all(a.get('type') in ('Суровини', 'Макро', 'Валути') for a in arts):
                 continue
             companies_html += _render_company_section(company, arts)
 
@@ -186,6 +187,42 @@ def build_html_email(articles: list[dict], summary_data: dict,
             </div>"""
         macro_html += '</div>'
         macro_html += '<p style="font-size:11px;color:#64748b;margin-top:10px;">💡 Лихвените проценти влияят на строителството и автомобилния сектор — основни потребители на TiO₂.</p>'
+
+    # ── Валутни курсове ──
+    fx_articles = [a for a in articles if a.get('type') == 'Валути']
+    fx_html = ""
+    if fx_articles:
+        fx_html += '<div class="fx-grid">'
+        seen_pairs = set()
+        for art in fx_articles:
+            comp = art.get('company', '')
+            pair_key = comp.split('(')[0].strip()
+            if pair_key in seen_pairs:
+                continue
+            seen_pairs.add(pair_key)
+            name_part = comp.split('(')[1].rstrip(')') if '(' in comp else ''
+            url_f = art.get('url', '#')
+            title_f = art.get('title', '')[:75]
+            fx_html += f"""
+            <div class="fx-card">
+              <div class="fx-pair">{pair_key}</div>
+              <div class="fx-name">{name_part}</div>
+              <div class="fx-title">{title_f}</div>
+              <a class="news-link" href="{url_f}" target="_blank" style="margin-top:6px;">🔗 Виж</a>
+            </div>"""
+        fx_html += '</div>'
+        fx_html += """
+        <div class="fx-logic">
+          <strong>💡 Как валутите влияят на TiO₂ пазара:</strong><br><br>
+          📈 <strong>Силен долар</strong> (EUR/USD ↓ под 1.05) → европейските производители
+          (Police, Precheza, Indorama, Kronos EU) стават <strong>по-конкурентни при износ</strong>
+          на изток и към САЩ — продуктите им са по-евтини в доларово изражение.<br><br>
+          📉 <strong>Слаб долар</strong> (EUR/USD ↑ над 1.15) → европейският износ
+          <strong>поскъпва и губи конкурентоспособност</strong>; американските (Tronox, Chemours, INEOS)
+          и китайските производители печелят предимство.<br><br>
+          🇨🇳 <strong>USD/CNY нагоре</strong> (слаб юан) → китайският износ поевтинява →
+          повече ценови натиск върху европейските и американските производители.
+        </div>"""
 
     # Регулаторни (от ОБЩИ или с тип Регулаторни)
     reg_articles = [a for a in articles if a.get('type') == 'Регулаторни']
@@ -243,6 +280,14 @@ def build_html_email(articles: list[dict], summary_data: dict,
   .comm-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: 12.5px; }}
   .comm-text {{ color: #78350f; line-height: 1.5; }}
   .sulfur-alert {{ background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; font-size: 12px; color: #991b1b; }}
+  .badge-fx {{ background: #cffafe; color: #155e75; }}
+  .fx-grid {{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }}
+  .fx-card {{ flex: 1; min-width: 150px; background: #ecfeff; border: 1px solid #a5f3fc; border-left: 3px solid #0891b2; border-radius: 0 8px 8px 0; padding: 10px 12px; }}
+  .fx-pair {{ font-size: 13px; font-weight: 800; color: #0e7490; font-family: monospace; }}
+  .fx-name {{ font-size: 10px; color: #155e75; margin-bottom: 6px; }}
+  .fx-title {{ font-size: 11px; color: #164e63; line-height: 1.4; }}
+  .fx-logic {{ background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 14px; font-size: 11.5px; color: #075985; line-height: 1.6; margin-top: 10px; }}
+  .fx-logic strong {{ color: #0c4a6e; }}
   .news-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid #e9edf2; font-size: 12.5px; }}
   .news-item:last-child {{ margin-bottom: 0; padding-bottom: 0; border-bottom: none; }}
   .news-dot {{ font-size: 16px; line-height: 1.3; flex-shrink: 0; }}
@@ -304,6 +349,8 @@ def build_html_email(articles: list[dict], summary_data: dict,
   {"<div class='section'><div class='section-title'>🟡 Цени на суровини</div>" + commodity_html + "</div>" if commodity_html else ""}
 
   {"<div class='section'><div class='section-title'>🏦 Лихвени проценти — макроикономически контекст</div>" + macro_html + "</div>" if macro_html else ""}
+
+  {"<div class='section'><div class='section-title'>💱 Валутни курсове — износна конкурентоспособност</div>" + fx_html + "</div>" if fx_html else ""}
 
   <div class="cta-section">
     <p style="font-size:13px; color:#475569; margin-bottom:14px;">Пълната история на всички данни:</p>
