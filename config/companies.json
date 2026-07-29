@@ -205,13 +205,44 @@
       "unit": "USD/long ton",
       "keywords": [
         "sulfur price 2026",
-        "elemental sulfur Tampa price",
-        "sulfur market outlook",
-        "сяра цена"
+        "sulphur price Tampa contract",
+        "sulfur market outlook 2026",
+        "sulphur price increase TiO2",
+        "elemental sulfur price forecast",
+        "sulfur Middle East FOB price"
       ],
       "sources": [
+        "https://www.icis.com/explore/resources/news/chemical-news/sulfur/",
         "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-sulfur.pdf",
-        "https://www.icis.com/explore/resources/news/chemical-news/sulfur/"
+        "https://www.argusmedia.com/en/commodities/fertilizers/argus-sulphur",
+        "https://www.chemanalyst.com/Pricing-data/sulphur-1288"
+      ],
+      "priority": "ВИСОК — критичен разходен фактор",
+      "affected_producers": [
+        "Grupa Azoty Police (сулфатен)",
+        "Precheza (сулфатен)",
+        "Kronos Worldwide (сулфатен + хлориден)",
+        "LB Group (сулфатен + хлориден)",
+        "Shandong Doguide (сулфатен)",
+        "Jinan Yuxing (сулфатен)"
+      ],
+      "impact_note": "Сулфатният метод изисква 3-4 тона сярна киселина на тон TiO₂. Скок в цената на сярата директно свива маржовете.",
+      "benchmarks": [
+        {
+          "name": "Tampa FL contract price",
+          "unit": "USD/long ton",
+          "note": "Световен benchmark"
+        },
+        {
+          "name": "Middle East FOB",
+          "unit": "USD/tonne",
+          "note": "Основен износен източник"
+        },
+        {
+          "name": "China CFR",
+          "unit": "USD/tonne",
+          "note": "Азиатски внос"
+        }
       ]
     },
     {
@@ -244,6 +275,52 @@
       ],
       "sources": [
         "https://www.icis.com/explore/resources/news/chemical-news/titanium-dioxide/"
+      ]
+    }
+  ],
+  "macro_indicators": [
+    {
+      "name": "US Federal Reserve — Fed Funds Rate",
+      "region": "🇺🇸 САЩ",
+      "relevance": "Влияе на строителство, автомобилен сектор и потребление на бои в САЩ",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+      "keywords": [
+        "Fed interest rate decision",
+        "FOMC rate 2026",
+        "Federal Reserve rate cut"
+      ]
+    },
+    {
+      "name": "European Central Bank — ECB Deposit Rate",
+      "region": "🇪🇺 Еврозона",
+      "relevance": "Ключов за европейските производители (Police, Precheza, Indorama, Kronos EU)",
+      "source_url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html",
+      "keywords": [
+        "ECB interest rate decision",
+        "ECB deposit rate 2026",
+        "European Central Bank rate"
+      ]
+    },
+    {
+      "name": "Bank of Japan — Policy Rate",
+      "region": "🇯🇵 Япония",
+      "relevance": "Влияе на азиатското търсене и валутни курсове (JPY/USD) за износ",
+      "source_url": "https://www.boj.or.jp/en/statistics/boj/other/discount/index.htm",
+      "keywords": [
+        "Bank of Japan rate decision",
+        "BOJ policy rate 2026",
+        "Japan interest rate"
+      ]
+    },
+    {
+      "name": "People's Bank of China — LPR (Loan Prime Rate)",
+      "region": "🇨🇳 Китай",
+      "relevance": "Критичен за китайските производители (LB Group, Doguide, Yuxing) и вътрешното строителство",
+      "source_url": "http://www.pbc.gov.cn/en/3688229/index.html",
+      "keywords": [
+        "China LPR rate",
+        "PBOC interest rate 2026",
+        "China loan prime rate decision"
       ]
     }
   ]
