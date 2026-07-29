@@ -47,6 +47,11 @@ def _type_badge(article_type: str) -> str:
         "Логистика":   ("badge-logi",  "Логистика"),
         "Капацитет":   ("badge-cap",   "Капацитет"),
         "Разследвания":("badge-inv",   "Разследване"),
+        "Алокация":    ("badge-alloc", "Алокация H₂SO₄"),
+        "ОперНива":    ("badge-oprate","Оп. нива"),
+        "Маржове":     ("badge-margin","Маржове"),
+        "ЕкспОгр":     ("badge-exp",   "Експорт огр."),
+        "Прекъсвания": ("badge-outage","Прекъсване"),
     }
     cls, label = colors.get(article_type, ("badge-news", article_type))
     return f'<span class="badge {cls}">{label}</span>'
@@ -107,7 +112,13 @@ def _render_company_section(company: str, articles: list[dict]) -> str:
 
 def build_html_email(articles: list[dict], summary_data: dict,
                       period_str: str, sheets_url: str,
-                      capacity_data: dict | None = None) -> str:
+                      capacity_data: dict | None = None,
+                      alloc_data: dict | None = None,
+                      oprate_data: dict | None = None,
+                      margin_data: dict | None = None,
+                      export_data: dict | None = None,
+                      outage_data: dict | None = None,
+                      markets_data: dict | None = None) -> str:
     """
     Изгражда пълния HTML email от динамичните данни.
     Връща HTML string готов за изпращане.
@@ -139,7 +150,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
     for company, arts in grouped.items():
         if company not in company_order and company != "ОБЩИ" and arts:
             # Пропускаме суровини и макро — те имат свои секции
-            if all(a.get('type') in ('Суровини', 'Макро', 'Валути', 'Енергия', 'Търсене', 'Логистика', 'Капацитет', 'Разследвания') for a in arts):
+            if all(a.get('type') in ('Суровини', 'Макро', 'Валути', 'Енергия', 'Търсене', 'Логистика', 'Капацитет', 'Разследвания', 'Алокация', 'ОперНива', 'Маржове', 'ЕкспОгр', 'Прекъсвания') for a in arts):
                 continue
             companies_html += _render_company_section(company, arts)
 
@@ -229,6 +240,118 @@ def build_html_email(articles: list[dict], summary_data: dict,
           🇨🇳 <strong>USD/CNY нагоре</strong> (слаб юан) → китайският износ поевтинява →
           повече ценови натиск върху европейските и американските производители.
         </div>"""
+
+    # ── Алокация H₂SO₄ ──
+    alloc_articles = [a for a in articles if a.get('type') == 'Алокация']
+    alloc_html = ""
+    if alloc_data:
+        s = alloc_data.get("consumption_split_china", {})
+        alloc_html += f"""
+        <div class="alloc-alert">
+          🚨 <strong>Проблемът е ДОСТЪПЪТ, не само цената.</strong><br>
+          TiO₂ е едва <strong>{s.get('titanium_dioxide', 9.4)}%</strong> от китайското потребление на H₂SO₄, докато торовете са <strong>{s.get('fertilizers', 60)}%</strong>.
+          При недостиг торовете се приоритизират — TiO₂ производителите просто не получават киселина, независимо колко са готови да платят.
+        </div>
+        <div class="alloc-bar">
+          <div class="alloc-seg" style="width:{s.get('fertilizers',60)}%;background:#16a34a;">Торове {s.get('fertilizers',60)}%</div>
+          <div class="alloc-seg" style="width:{s.get('chemical',11.4)}%;background:#7c3aed;">Хим. {s.get('chemical',11.4)}%</div>
+          <div class="alloc-seg" style="width:{s.get('industrial',10.8)}%;background:#0891b2;">Инд. {s.get('industrial',10.8)}%</div>
+          <div class="alloc-seg" style="width:{s.get('titanium_dioxide',9.4)}%;background:#e11d48;">TiO₂ {s.get('titanium_dioxide',9.4)}%</div>
+          <div class="alloc-seg" style="width:{s.get('other',8.4)}%;background:#94a3b8;">Др.</div>
+        </div>
+        <p class="alloc-legend">Разпределение на H₂SO₄ потреблението в Китай (общо {alloc_data.get('china_total_kmt',106277):,} кт)</p>"""
+    for art in alloc_articles[:5]:
+        alloc_html += f"""
+        <div class="comm-item"><div>🧪</div><div class="comm-text">
+          <strong>{art.get('title','')}</strong><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {art.get('source','')}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+
+    # ── Оперативни нива + Маржове ──
+    oprate_articles = [a for a in articles if a.get('type') in ('ОперНива', 'Маржове')]
+    oprate_html = ""
+    if oprate_data:
+        hist = oprate_data.get("historical", [])
+        oprate_html += '<div class="oprate-box"><div style="font-size:11px;font-weight:700;color:#312e81;">Натоварване на китайските TiO₂ заводи</div><div class="oprate-chart">'
+        for h in hist:
+            pct = h["rate"]
+            height = (pct - 50) * 2.2
+            oprate_html += f'<div style="flex:1;"><div class="oprate-bar" style="height:{height}px;"><div class="oprate-val">{pct}%</div></div><div class="oprate-lbl">{h["period"][2:]}</div></div>'
+        oprate_html += '</div><p style="font-size:10.5px;color:#64748b;margin-top:14px;">⚠️ Спад под <strong>60%</strong> предвещава ценови скок 1-2 месеца напред. Това е по-точен сигнал от ценовите новини.</p></div>'
+    if margin_data:
+        cny = margin_data.get("current_china_loss_cny_mt", 0)
+        usd = margin_data.get("current_china_loss_usd_mt", 0)
+        oprate_html += f"""
+        <div class="margin-box">
+          <div class="margin-num">¥{cny:,} / ${usd}</div>
+          <div class="margin-lbl">Текуща загуба на тон при китайските производители</div>
+          <p style="font-size:10.5px;color:#7c2d12;margin-top:8px;">Измерва <strong>колко дълго могат да издържат</strong>. При непоносима загуба → вълна от спирания → ценови обрат.<br>{margin_data.get('sulfur_ratio','')}</p>
+        </div>"""
+    for art in oprate_articles[:5]:
+        oprate_html += f"""
+        <div class="comm-item"><div>📉</div><div class="comm-text">
+          <strong>{art.get('title','')}</strong><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {art.get('source','')}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+
+    # ── Прекъсвания ──
+    outage_articles = [a for a in articles if a.get('type') == 'Прекъсвания']
+    outage_html = ""
+    if outage_articles or outage_data:
+        outage_html += '<p style="font-size:11.5px;color:#7f1d1d;margin-bottom:10px;">⛔ <strong>Движат спот-цените ВЕДНАГА</strong> — за разлика от обявените затваряния, които се очакват предварително.</p>'
+    for e in (outage_data or {}).get("recent_events", []):
+        outage_html += f"""
+        <div class="outage-item"><div>⛔</div><div>
+          <strong>{e['company']}</strong> — {e['site']}<br>
+          <small>{e['event']}</small><br>
+          <span style="font-size:10px;color:#991b1b;">Тип: {e['type']}</span>
+        </div></div>"""
+    for art in outage_articles[:5]:
+        outage_html += f"""
+        <div class="outage-item"><div>🔔</div><div>
+          <strong>{art.get('title','')}</strong><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {art.get('source','')}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+
+    # ── Експортни ограничения ──
+    exp_articles = [a for a in articles if a.get('type') == 'ЕкспОгр']
+    export_html = ""
+    if export_data:
+        export_html += '<p style="font-size:11.5px;color:#4c1d95;margin-bottom:10px;">🚫 <strong>Различен механизъм от антидъмпинга.</strong> Експортният контрол върху СУРОВИНА засяга производството навсякъде, докато вносните мита защитават конкретен пазар.</p>'
+        for r in export_data.get("active", []):
+            export_html += f"""
+            <div class="exp-item"><div>🚫</div><div>
+              <strong>{r['country']} — {r['item']}</strong><br>
+              <small>{r['type']} · {r['period']}</small>
+              {"<br><small>➜ " + r['impact'] + "</small>" if r.get('impact') else ""}
+            </div></div>"""
+    for art in exp_articles[:4]:
+        export_html += f"""
+        <div class="exp-item"><div>📋</div><div>
+          <strong>{art.get('title','')}</strong><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {art.get('source','')}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+
+    # ── Адресируеми пазари ──
+    markets_html = ""
+    if markets_data:
+        markets_html += '<p style="font-size:11.5px;color:#334155;margin-bottom:10px;">🌍 Показва <strong>накъде се пренасочват китайските обеми</strong> при всяко ново мито и кои пазари се насищат.</p>'
+        markets_html += '<table class="mkt-table"><tr><th>Регион</th><th>Размер</th><th>Статус за китайски внос</th></tr>'
+        for m in markets_data.get("regions", []):
+            st = m["china_status"]
+            cls = "mkt-blocked" if "Мита" in st or "мито" in st else ("mkt-pending" if "Разследване" in st else "mkt-open")
+            markets_html += f'<tr><td><strong>{m["region"]}</strong></td><td>{m["size_kmt"]} кт</td><td class="{cls}">{st}</td></tr>'
+        markets_html += '</table>'
+        markets_html += '<p style="font-size:10.5px;color:#64748b;margin:12px 0 6px;font-weight:700;">Търговски бариери по юрисдикция:</p>'
+        markets_html += '<table class="mkt-table"><tr><th>Юрисдикция</th><th>Мита</th><th>Статус</th><th>Ефект</th></tr>'
+        for b in markets_data.get("trade_barriers_summary", []):
+            cls = "mkt-pending" if "РАЗСЛЕДВАНЕ" in b["status"] else ("mkt-open" if "ПАУЗИРАН" in b["status"] else "mkt-blocked")
+            markets_html += f'<tr><td>{b["jurisdiction"]}</td><td>{b["duties"]}</td><td class="{cls}">{b["status"]}</td><td>{b["impact"]}</td></tr>'
+        markets_html += '</table>'
 
     # ── Капацитет ──
     cap_articles = [a for a in articles if a.get('type') == 'Капацитет']
@@ -403,6 +526,31 @@ def build_html_email(articles: list[dict], summary_data: dict,
   .cap-box-net {{ background: #eff6ff; border: 1px solid #93c5fd; }}
   .cap-num {{ font-size: 20px; font-weight: 800; }}
   .cap-label {{ font-size: 10px; color: #64748b; margin-top: 3px; }}
+  .badge-alloc  {{ background: #fecdd3; color: #881337; }}
+  .badge-oprate {{ background: #c7d2fe; color: #312e81; }}
+  .badge-margin {{ background: #fed7aa; color: #7c2d12; }}
+  .badge-exp    {{ background: #ddd6fe; color: #4c1d95; }}
+  .badge-outage {{ background: #fecaca; color: #7f1d1d; }}
+  .alloc-alert {{ background: #fff1f2; border: 2px solid #e11d48; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 12.5px; color: #881337; line-height: 1.6; }}
+  .alloc-bar {{ display: flex; height: 26px; border-radius: 6px; overflow: hidden; margin: 10px 0 6px; font-size: 9px; font-weight: 700; }}
+  .alloc-seg {{ display: flex; align-items: center; justify-content: center; color: #fff; }}
+  .alloc-legend {{ font-size: 10px; color: #64748b; }}
+  .oprate-box {{ background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }}
+  .oprate-chart {{ display: flex; align-items: flex-end; gap: 4px; height: 70px; margin: 10px 0; }}
+  .oprate-bar {{ flex: 1; background: linear-gradient(to top, #4f46e5, #818cf8); border-radius: 3px 3px 0 0; position: relative; }}
+  .oprate-val {{ position: absolute; top: -14px; left: 0; right: 0; text-align: center; font-size: 9px; font-weight: 700; color: #312e81; }}
+  .oprate-lbl {{ font-size: 8px; color: #64748b; text-align: center; margin-top: 3px; }}
+  .margin-box {{ background: #fff7ed; border: 2px solid #ea580c; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; text-align: center; }}
+  .margin-num {{ font-size: 26px; font-weight: 800; color: #dc2626; font-family: monospace; }}
+  .margin-lbl {{ font-size: 11px; color: #7c2d12; margin-top: 4px; }}
+  .mkt-table {{ width: 100%; border-collapse: collapse; font-size: 11px; }}
+  .mkt-table th {{ background: #0f2444; color: #cbd5e1; padding: 6px 8px; text-align: left; font-size: 9.5px; text-transform: uppercase; }}
+  .mkt-table td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; }}
+  .mkt-blocked {{ color: #dc2626; font-weight: 600; }}
+  .mkt-open {{ color: #16a34a; font-weight: 600; }}
+  .mkt-pending {{ color: #d97706; font-weight: 600; }}
+  .exp-item {{ display: flex; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #faf5ff; border-left: 3px solid #7c3aed; border-radius: 0 6px 6px 0; font-size: 12.5px; color: #4c1d95; line-height: 1.5; }}
+  .outage-item {{ display: flex; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #fef2f2; border-left: 3px solid #dc2626; border-radius: 0 6px 6px 0; font-size: 12.5px; color: #7f1d1d; line-height: 1.5; }}
   .news-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid #e9edf2; font-size: 12.5px; }}
   .news-item:last-child {{ margin-bottom: 0; padding-bottom: 0; border-bottom: none; }}
   .news-dot {{ font-size: 16px; line-height: 1.3; flex-shrink: 0; }}
@@ -467,7 +615,17 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
   {"<div class='section'><div class='section-title'>💱 Валутни курсове — износна конкурентоспособност</div>" + fx_html + "</div>" if fx_html else ""}
 
+  {"<div class='section'><div class='section-title'>🧪 Алокация на сярна киселина — ДОСТЪП, не само цена</div>" + alloc_html + "</div>" if alloc_html else ""}
+
+  {"<div class='section'><div class='section-title'>📉 Оперативни нива и маржове — Китай</div>" + oprate_html + "</div>" if oprate_html else ""}
+
   {"<div class='section'><div class='section-title'>🏗️ Капацитет — затваряния и рестарти</div>" + capacity_html + "</div>" if capacity_html else ""}
+
+  {"<div class='section'><div class='section-title'>⛔ Непланирани прекъсвания</div>" + outage_html + "</div>" if outage_html else ""}
+
+  {"<div class='section'><div class='section-title'>🚫 Експортни ограничения</div>" + export_html + "</div>" if export_html else ""}
+
+  {"<div class='section'><div class='section-title'>🌍 Адресируеми пазари и търговски бариери</div>" + markets_html + "</div>" if markets_html else ""}
 
   {"<div class='section'><div class='section-title'>⚡ Енергийни цени</div>" + energy_html + "</div>" if energy_html else ""}
 
