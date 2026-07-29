@@ -323,5 +323,72 @@
         "China loan prime rate decision"
       ]
     }
+  ],
+  "currency_pairs": [
+    {
+      "pair": "EUR/USD",
+      "name": "Евро / Долар",
+      "priority": "ВИСОК — определя конкурентоспособността на европейския износ",
+      "logic": {
+        "strong_dollar": "Силен долар (EUR/USD ↓ под 1.05) → европейските производители (Police, Precheza, Indorama, Kronos EU) стават по-конкурентни при износ извън еврозоната. Продуктите им са по-евтини в доларово изражение → повече износ на изток и към САЩ.",
+        "weak_dollar": "Слаб долар (EUR/USD ↑ над 1.15) → европейският износ поскъпва и губи конкурентоспособност. Американските (Tronox, Chemours, INEOS) и азиатските производители печелят предимство на европейския пазар."
+      },
+      "affected_exporters": [
+        "Grupa Azoty Police (PL)",
+        "Precheza (CZ)",
+        "Indorama Huelva (ES)",
+        "Kronos Europe (DE/BE/NO)"
+      ],
+      "keywords": [
+        "EUR USD exchange rate",
+        "euro dollar forecast 2026",
+        "EURUSD outlook",
+        "euro exchange rate news"
+      ],
+      "sources": [
+        "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
+      ]
+    },
+    {
+      "pair": "USD/CNY",
+      "name": "Долар / Китайски юан",
+      "priority": "ВИСОК — определя китайския ценови натиск",
+      "logic": {
+        "strong_dollar": "Силен долар / слаб юан (USD/CNY ↑ над 7.30) → китайският износ поевтинява → повече натиск върху европейските и американските цени.",
+        "weak_dollar": "Слаб долар / силен юан (USD/CNY ↓ под 7.00) → китайският износ поскъпва → облекчение за западните производители."
+      },
+      "affected_exporters": [
+        "LB Group (CN)",
+        "Shandong Doguide (CN)",
+        "Jinan Yuxing (CN)"
+      ],
+      "keywords": [
+        "USD CNY exchange rate",
+        "yuan dollar rate 2026",
+        "chinese yuan devaluation export"
+      ],
+      "sources": [
+        "http://www.pbc.gov.cn/en/3688229/index.html"
+      ]
+    },
+    {
+      "pair": "USD/JPY",
+      "name": "Долар / Японска йена",
+      "priority": "СРЕДЕН — азиатски пазарен индикатор",
+      "logic": {
+        "strong_dollar": "Силен долар / слаба йена → японският внос на TiO₂ поскъпва → намалено търсене от Япония.",
+        "weak_dollar": "Слаб долар / силна йена → японското търсене се засилва."
+      },
+      "affected_exporters": [
+        "Всички износители за Азия"
+      ],
+      "keywords": [
+        "USD JPY exchange rate",
+        "yen dollar forecast 2026"
+      ],
+      "sources": [
+        "https://www.boj.or.jp/en/statistics/market/forex/index.htm"
+      ]
+    }
   ]
 }
