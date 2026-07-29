@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # Добавяме src/ в path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from scraper import scrape_all
+from scraper import scrape_all, get_capacity_balance
 from dedup import deduplicate
 from ai_summary import generate_summary
 from sheets import append_articles, append_archive_row
@@ -124,11 +124,22 @@ def main() -> None:
 
     # ── СТЪПКА 5: HTML Email + Drive ────────
     logger.info("\n📄 СТЪПКА 5: Генериране на HTML доклад...")
+    # Капацитетен баланс от конфига
+    import json as _json
+    _cfg_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'companies.json')
+    with open(_cfg_path, 'r', encoding='utf-8') as _f:
+        _config = _json.load(_f)
+    capacity_data = get_capacity_balance(_config)
+    logger.info(f"   Капацитет: -{capacity_data['offline_kt']} кт офлайн, "
+                f"+{capacity_data['online_kt']} кт рестарт, "
+                f"нето {capacity_data['net_kt']:+} кт")
+
     html_content = build_html_email(
         articles=enriched_articles,
         summary_data=summary_data,
         period_str=period_str,
         sheets_url=history_url,
+        capacity_data=capacity_data,
     )
 
     logger.info("\n📁 СТЪПКА 5б: Качване в Google Drive...")
