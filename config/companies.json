@@ -390,5 +390,213 @@
         "https://www.boj.or.jp/en/statistics/market/forex/index.htm"
       ]
     }
-  ]
+  ],
+  "energy_indicators": [
+    {
+      "name": "TTF Natural Gas (Европа)",
+      "relevance": "Хлоридният метод изисква >1000°C. Високите газови цени убиха Venator Greatham и Botlek.",
+      "unit": "EUR/MWh",
+      "threshold_warning": 50,
+      "keywords": [
+        "TTF gas price Europe",
+        "European natural gas price 2026",
+        "Dutch TTF benchmark"
+      ]
+    },
+    {
+      "name": "Електроенергия — Германия / Полша",
+      "relevance": "Основен разход за Kronos (DE), Police (PL), Precheza (CZ)",
+      "unit": "EUR/MWh",
+      "keywords": [
+        "German power price 2026",
+        "European electricity price industry",
+        "Poland electricity price industrial"
+      ]
+    },
+    {
+      "name": "Brent Crude Oil",
+      "relevance": "Влияе на сярата (byproduct от преработка), логистиката и общата химическа верига",
+      "unit": "USD/bbl",
+      "keywords": [
+        "Brent crude oil price",
+        "oil price forecast 2026"
+      ]
+    }
+  ],
+  "demand_indicators": [
+    {
+      "category": "Производители на бои (най-важният сигнал за търсене)",
+      "companies": [
+        {
+          "name": "PPG Industries",
+          "ticker": "PPG",
+          "region": "Global"
+        },
+        {
+          "name": "Sherwin-Williams",
+          "ticker": "SHW",
+          "region": "US"
+        },
+        {
+          "name": "AkzoNobel",
+          "ticker": "AKZA.AS",
+          "region": "EU"
+        },
+        {
+          "name": "Jotun",
+          "ticker": null,
+          "region": "EU/Marine"
+        },
+        {
+          "name": "Nippon Paint",
+          "ticker": "4612.T",
+          "region": "Asia"
+        }
+      ],
+      "relevance": "Техните отчети показват реалното търсене 1-2 тримесечия напред от TiO₂ поръчките",
+      "keywords": [
+        "PPG earnings volume outlook",
+        "Sherwin Williams results demand",
+        "AkzoNobel results 2026",
+        "paint demand outlook 2026"
+      ]
+    },
+    {
+      "category": "Строителство",
+      "relevance": "Най-големият краен пазар за TiO₂ през боите",
+      "keywords": [
+        "US housing starts building permits",
+        "European construction output 2026",
+        "China property market construction"
+      ]
+    },
+    {
+      "category": "Автомобилно производство",
+      "relevance": "Втори по големина пазар — автомобилни бои и пластмаси",
+      "keywords": [
+        "global auto production forecast 2026",
+        "European car production output"
+      ]
+    }
+  ],
+  "logistics_indicators": [
+    {
+      "name": "Контейнерни навла Шанхай → Ротердам",
+      "relevance": "Определя дали китайският TiO₂ остава конкурентен в Европа. При скок навлата китайското ценово предимство изчезва без промяна в заводската цена.",
+      "unit": "USD/FEU",
+      "keywords": [
+        "Shanghai Rotterdam container freight rate",
+        "China Europe shipping rates 2026",
+        "SCFI index"
+      ]
+    },
+    {
+      "name": "Baltic Dry Index (BDI)",
+      "relevance": "Насипни товари — илменит, рутил, титанова руда",
+      "keywords": [
+        "Baltic Dry Index 2026",
+        "dry bulk shipping rates"
+      ]
+    },
+    {
+      "name": "Прекъсвания по маршрути",
+      "relevance": "Червено море, Ормузки проток, Суец, Панама — директен ефект върху доставките и сярата",
+      "keywords": [
+        "Red Sea shipping disruption 2026",
+        "Strait of Hormuz shipping",
+        "Suez Canal traffic chemicals"
+      ]
+    }
+  ],
+  "capacity_tracker": {
+    "relevance": "Най-силният ценови сигнал в индустрията. Над 1.1 млн. т (≈11% от световния пазар) е излязло през 2025-2026.",
+    "keywords": [
+      "TiO2 plant closure 2026",
+      "titanium dioxide capacity shutdown",
+      "TiO2 plant restart production",
+      "titanium dioxide capacity expansion 2026",
+      "TiO2 idled plant"
+    ],
+    "known_events": [
+      {
+        "site": "Tronox Botlek (NL)",
+        "capacity_kt": 90,
+        "status": "ЗАТВОРЕН",
+        "date": "2025-03",
+        "process": "chloride"
+      },
+      {
+        "site": "Tronox Fuzhou (CN)",
+        "capacity_kt": 46,
+        "status": "ЗАТВОРЕН",
+        "date": "2026-01",
+        "process": "sulphate"
+      },
+      {
+        "site": "Venator Uerdingen (DE)",
+        "capacity_kt": 107,
+        "status": "ЗАТВОРЕН",
+        "date": "2026-05",
+        "process": "sulphate"
+      },
+      {
+        "site": "Venator Greatham (UK) → LB Tioxide",
+        "capacity_kt": 150,
+        "status": "РЕСТАРТ",
+        "date": "2026",
+        "process": "chloride"
+      },
+      {
+        "site": "Venator Huelva (ES) → Indorama",
+        "capacity_kt": 80,
+        "status": "РЕСТАРТИРАН",
+        "date": "2026-05",
+        "process": "sulphate"
+      },
+      {
+        "site": "Venator Scarlino (IT) → Soltiox",
+        "capacity_kt": null,
+        "status": "РЕСТАРТ 2 линии",
+        "date": "2026",
+        "process": "sulphate"
+      },
+      {
+        "site": "Venator Teluk Kalung (MY)",
+        "capacity_kt": 60,
+        "status": "СПРЯН",
+        "date": "2025-09",
+        "process": "sulphate"
+      }
+    ]
+  },
+  "trade_investigations": {
+    "relevance": "ИНИЦИИРАНЕТО на разследване движи пазара месеци преди решението. Ранен сигнал за реакция при договаряне.",
+    "monitored_jurisdictions": [
+      "ЕС",
+      "САЩ",
+      "Бразилия",
+      "Индия",
+      "Турция",
+      "Саудитска Арабия",
+      "Мексико",
+      "Египет"
+    ],
+    "keywords": [
+      "TiO2 antidumping investigation initiated",
+      "titanium dioxide trade case new",
+      "TiO2 safeguard investigation 2026",
+      "titanium dioxide countervailing duty",
+      "TiO2 anti-dumping review expiry"
+    ],
+    "stages": [
+      "Инициирано разследване",
+      "Предварителни мита",
+      "Финални мита",
+      "Преглед/изтичане"
+    ],
+    "sources": [
+      "https://policy.trade.ec.europa.eu/enforcement-and-protection/trade-defence_en",
+      "https://www.trade.gov/data-visualization/adcvd-proceedings"
+    ]
+  }
 }
