@@ -312,6 +312,26 @@ def scrape_all(days_back: int = 7) -> list[dict]:
     fx_arts = fetch_currency_rates(config, days_back)
     all_articles.extend(fx_arts)
 
+    # ── 1. Енергия ──
+    logger.info("📡 Енергийни цени (TTF газ, ток, Brent)...")
+    all_articles.extend(fetch_energy_prices(config, days_back))
+
+    # ── 2. Търсене (downstream) ──
+    logger.info("📡 Индикатори на търсенето (бои, строителство, авто)...")
+    all_articles.extend(fetch_demand_indicators(config, days_back))
+
+    # ── 3. Логистика ──
+    logger.info("📡 Логистика и навла...")
+    all_articles.extend(fetch_logistics(config, days_back))
+
+    # ── 4. Капацитет ──
+    logger.info("📡 Затваряния и рестарти на капацитет...")
+    all_articles.extend(fetch_capacity_changes(config, days_back))
+
+    # ── 5. Търговски разследвания ──
+    logger.info("📡 Търговски разследвания (ранни сигнали)...")
+    all_articles.extend(fetch_trade_investigations(config, days_back))
+
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
 
@@ -380,4 +400,156 @@ def fetch_currency_rates(config: dict, days_back: int) -> list[dict]:
             articles.extend(arts)
             time.sleep(0.4)
     logger.info(f"  Валутни курсове: {len(articles)} статии намерени")
+    return articles
+
+
+# ═════════════════════════════════════════════
+#  РАЗШИРЕНИ ИНДИКАТОРИ (5 нови измерения)
+# ═════════════════════════════════════════════
+
+# ── 1. ЕНЕРГИЯ ────────────────────────────────
+
+def fetch_energy_prices(config: dict, days_back: int) -> list[dict]:
+    """
+    Енергийни цени — TTF газ, електроенергия, Brent.
+
+    Хлоридният метод изисква температури над 1000°C. Високите
+    енергийни цени в Европа бяха основната причина за затварянето
+    на Venator Greatham и Tronox Botlek. Този индикатор показва
+    кога европейските производители влизат в зоната на загубата
+    ПРЕДИ да го обявят официално.
+    """
+    articles = []
+    for ind in config.get("energy_indicators", []):
+        for keyword in ind.get("keywords", []):
+            arts = fetch_google_news(keyword, ind["name"], "Енергия", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+    logger.info(f"  Енергия: {len(articles)} статии")
+    return articles
+
+
+# ── 2. ТЪРСЕНЕ (downstream) ───────────────────
+
+def fetch_demand_indicators(config: dict, days_back: int) -> list[dict]:
+    """
+    Индикатори на ТЪРСЕНЕТО, не само на разходите.
+
+    TiO₂ се продава чрез бои → строителство и автомобили.
+    Отчетите на PPG, Sherwin-Williams, AkzoNobel и Jotun показват
+    какво реално се търси 1-2 тримесечия напред от TiO₂ поръчките.
+    """
+    articles = []
+    for group in config.get("demand_indicators", []):
+        category = group.get("category", "Търсене")
+
+        # Отделни търсения за всеки производител на бои
+        for company in group.get("companies", []):
+            query = f"{company['name']} results outlook 2026"
+            arts = fetch_google_news(query, f"Търсене — {company['name']}", "Търсене", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+
+            # Yahoo Finance за публичните
+            if company.get("ticker"):
+                arts = fetch_yahoo_finance_news(company["ticker"], f"Търсене — {company['name']}", days_back)
+                articles.extend(arts)
+                time.sleep(0.3)
+
+        # Общи ключови думи за категорията
+        for keyword in group.get("keywords", []):
+            arts = fetch_google_news(keyword, f"Търсене — {category}", "Търсене", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+
+    logger.info(f"  Търсене: {len(articles)} статии")
+    return articles
+
+
+# ── 3. ЛОГИСТИКА ──────────────────────────────
+
+def fetch_logistics(config: dict, days_back: int) -> list[dict]:
+    """
+    Морски навла и логистични прекъсвания.
+
+    Китайският TiO₂ е конкурентен само ако доставката е евтина.
+    При скок в контейнерните навла Шанхай→Ротердам, китайското
+    ценово предимство в Европа изчезва без никаква промяна в
+    заводската цена.
+    """
+    articles = []
+    for ind in config.get("logistics_indicators", []):
+        for keyword in ind.get("keywords", []):
+            arts = fetch_google_news(keyword, ind["name"], "Логистика", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+    logger.info(f"  Логистика: {len(articles)} статии")
+    return articles
+
+
+# ── 4. КАПАЦИТЕТ ──────────────────────────────
+
+def fetch_capacity_changes(config: dict, days_back: int) -> list[dict]:
+    """
+    Обявени затваряния и рестарти на производствен капацитет.
+
+    Това е най-силният ценови сигнал в индустрията. Над 1.1 млн.
+    тона (≈11% от световния пазар) излязоха от производство през
+    2025-2026. Всяко обявено затваряне или рестарт променя
+    баланса търсене/предлагане месеци напред.
+    """
+    tracker = config.get("capacity_tracker", {})
+    articles = []
+    for keyword in tracker.get("keywords", []):
+        arts = fetch_google_news(keyword, "Капацитет", "Капацитет", days_back)
+        articles.extend(arts)
+        time.sleep(0.4)
+    logger.info(f"  Капацитет: {len(articles)} статии")
+    return articles
+
+
+def get_capacity_balance(config: dict) -> dict:
+    """
+    Изчислява нетния капацитетен баланс от известните събития.
+    Връща обобщение колко капацитет влиза и излиза от пазара.
+    """
+    events = config.get("capacity_tracker", {}).get("known_events", [])
+    offline = sum(e.get("capacity_kt") or 0 for e in events
+                  if e.get("status", "").startswith(("ЗАТВОРЕН", "СПРЯН")))
+    online = sum(e.get("capacity_kt") or 0 for e in events
+                 if e.get("status", "").startswith("РЕСТАРТ"))
+    return {
+        "offline_kt": offline,
+        "online_kt": online,
+        "net_kt": online - offline,
+        "events": events,
+    }
+
+
+# ── 5. ТЪРГОВСКИ РАЗСЛЕДВАНИЯ ─────────────────
+
+def fetch_trade_investigations(config: dict, days_back: int) -> list[dict]:
+    """
+    Търговски разследвания в РАННА фаза.
+
+    Инициирането на разследване (ЕС, Бразилия, Индия, Турция)
+    движи пазара месеци преди финалното решение. Ранното
+    сигнализиране дава време за реакция при договаряне на
+    доставки и цени.
+    """
+    trade = config.get("trade_investigations", {})
+    articles = []
+    for keyword in trade.get("keywords", []):
+        arts = fetch_google_news(keyword, "Търговски разследвания", "Разследвания", days_back)
+        articles.extend(arts)
+        time.sleep(0.4)
+
+    # Търсене по юрисдикции
+    for juris in trade.get("monitored_jurisdictions", []):
+        query = f"{juris} titanium dioxide trade investigation 2026"
+        arts = fetch_google_news(query, f"Разследване — {juris}", "Разследвания", days_back)
+        articles.extend(arts)
+        time.sleep(0.3)
+
+    logger.info(f"  Търговски разследвания: {len(articles)} статии")
     return articles
