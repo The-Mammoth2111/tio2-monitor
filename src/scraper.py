@@ -307,6 +307,11 @@ def scrape_all(days_back: int = 7) -> list[dict]:
     macro_arts = fetch_macro_indicators(config, days_back)
     all_articles.extend(macro_arts)
 
+    # ── Валутни курсове ──
+    logger.info("📡 Валутни курсове (EUR/USD, USD/CNY, USD/JPY)...")
+    fx_arts = fetch_currency_rates(config, days_back)
+    all_articles.extend(fx_arts)
+
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
 
@@ -350,4 +355,29 @@ def fetch_macro_indicators(config: dict, days_back: int) -> list[dict]:
             articles.extend(arts)
             time.sleep(0.4)
     logger.info(f"  Макро индикатори: {len(articles)} статии намерени")
+    return articles
+
+
+# ─────────────────────────────────────────────
+# 7. Валутни курсове — EUR/USD, USD/CNY, USD/JPY
+# ─────────────────────────────────────────────
+
+def fetch_currency_rates(config: dict, days_back: int) -> list[dict]:
+    """
+    Търси новини за ключовите валутни двойки.
+
+    Логика на влиянието:
+      - Силен долар (EUR/USD надолу) → европейският износ става
+        по-конкурентен на изток и в САЩ.
+      - Слаб долар (EUR/USD нагоре) → европейският износ поскъпва,
+        американските и азиатските производители печелят предимство.
+    """
+    articles = []
+    for pair in config.get("currency_pairs", []):
+        name = f"{pair['pair']} ({pair['name']})"
+        for keyword in pair.get("keywords", []):
+            arts = fetch_google_news(keyword, name, "Валути", days_back)
+            articles.extend(arts)
+            time.sleep(0.4)
+    logger.info(f"  Валутни курсове: {len(articles)} статии намерени")
     return articles
