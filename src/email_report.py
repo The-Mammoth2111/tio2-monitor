@@ -39,6 +39,8 @@ def _type_badge(article_type: str) -> str:
         "Цени":        ("badge-price", "Цени"),
         "Продукти":    ("badge-prod",  "Продукти"),
         "Новини":      ("badge-news",  "Новини"),
+        "Суровини":    ("badge-comm",  "Суровини"),
+        "Макро":       ("badge-macro", "Макро"),
     }
     cls, label = colors.get(article_type, ("badge-news", article_type))
     return f'<span class="badge {cls}">{label}</span>'
@@ -129,7 +131,61 @@ def build_html_email(articles: list[dict], summary_data: dict,
     # Добавяме останали компании (ако има)
     for company, arts in grouped.items():
         if company not in company_order and company != "ОБЩИ" and arts:
+            # Пропускаме суровини и макро — те имат свои секции
+            if all(a.get('type') in ('Суровини', 'Макро') for a in arts):
+                continue
             companies_html += _render_company_section(company, arts)
+
+    # ── Суровини ──
+    comm_articles = [a for a in articles if a.get('type') == 'Суровини']
+    commodity_html = ""
+    sulfur_articles = [a for a in comm_articles if 'Сяра' in a.get('company', '')]
+    if sulfur_articles:
+        commodity_html += """
+        <div class="sulfur-alert">
+          ⚠️ <strong>Сярата е критичен разходен фактор.</strong> Сулфатният метод изисква 3–4 тона сярна киселина на тон TiO₂.
+          Засегнати: Police, Precheza, Kronos, LB Group, Doguide, Yuxing.
+        </div>"""
+    for art in comm_articles[:8]:
+        url_c = art.get('url', '#')
+        title_c = art.get('title', '')
+        company_c = art.get('company', '')
+        source_c = art.get('source', '')
+        date_c = art.get('date', '')
+        icon = "🟡" if "Сяра" in company_c and "киселина" not in company_c else ("🔴" if "киселина" in company_c else "⚫")
+        commodity_html += f"""
+        <div class="comm-item">
+          <div>{icon}</div>
+          <div class="comm-text">
+            <strong>{title_c}</strong><br>
+            <small style="color:#92400e;">{company_c}</small><br>
+            <a class="news-link" href="{url_c}" target="_blank">🔗 {source_c}</a>
+            <span class="news-date">{date_c}</span>
+          </div>
+        </div>"""
+
+    # ── Макро индикатори ──
+    macro_articles = [a for a in articles if a.get('type') == 'Макро']
+    macro_html = ""
+    if macro_articles:
+        macro_html += '<div class="macro-grid">'
+        seen_regions = set()
+        for art in macro_articles:
+            comp = art.get('company', '')
+            region_key = comp.split('—')[0].strip()
+            if region_key in seen_regions:
+                continue
+            seen_regions.add(region_key)
+            url_m = art.get('url', '#')
+            title_m = art.get('title', '')[:80]
+            macro_html += f"""
+            <div class="macro-card">
+              <div class="macro-region">{region_key}</div>
+              <div class="macro-title">{title_m}</div>
+              <a class="news-link" href="{url_m}" target="_blank" style="margin-top:6px;">🔗 Виж</a>
+            </div>"""
+        macro_html += '</div>'
+        macro_html += '<p style="font-size:11px;color:#64748b;margin-top:10px;">💡 Лихвените проценти влияят на строителството и автомобилния сектор — основни потребители на TiO₂.</p>'
 
     # Регулаторни (от ОБЩИ или с тип Регулаторни)
     reg_articles = [a for a in articles if a.get('type') == 'Регулаторни']
@@ -178,6 +234,15 @@ def build_html_email(articles: list[dict], summary_data: dict,
   .badge-reg   {{ background: #fce7f3; color: #9d174d; }}
   .badge-prod  {{ background: #ede9fe; color: #5b21b6; }}
   .badge-count {{ background: #e0f2fe; color: #0369a1; }}
+  .badge-comm  {{ background: #fef08a; color: #713f12; }}
+  .badge-macro {{ background: #ddd6fe; color: #4c1d95; }}
+  .macro-grid {{ display: flex; gap: 8px; flex-wrap: wrap; }}
+  .macro-card {{ flex: 1; min-width: 130px; background: #faf5ff; border: 1px solid #ddd6fe; border-left: 3px solid #7c3aed; border-radius: 0 8px 8px 0; padding: 10px 12px; }}
+  .macro-region {{ font-size: 11px; font-weight: 700; color: #5b21b6; margin-bottom: 4px; }}
+  .macro-title {{ font-size: 11px; color: #6b21a8; line-height: 1.4; }}
+  .comm-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: 12.5px; }}
+  .comm-text {{ color: #78350f; line-height: 1.5; }}
+  .sulfur-alert {{ background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; font-size: 12px; color: #991b1b; }}
   .news-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid #e9edf2; font-size: 12.5px; }}
   .news-item:last-child {{ margin-bottom: 0; padding-bottom: 0; border-bottom: none; }}
   .news-dot {{ font-size: 16px; line-height: 1.3; flex-shrink: 0; }}
@@ -235,6 +300,10 @@ def build_html_email(articles: list[dict], summary_data: dict,
   </div>
 
   {"<div class='section'><div class='section-title'>⚖️ Регулаторни промени</div>" + reg_html + "</div>" if reg_html else ""}
+
+  {"<div class='section'><div class='section-title'>🟡 Цени на суровини</div>" + commodity_html + "</div>" if commodity_html else ""}
+
+  {"<div class='section'><div class='section-title'>🏦 Лихвени проценти — макроикономически контекст</div>" + macro_html + "</div>" if macro_html else ""}
 
   <div class="cta-section">
     <p style="font-size:13px; color:#475569; margin-bottom:14px;">Пълната история на всички данни:</p>
