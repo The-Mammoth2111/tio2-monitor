@@ -140,6 +140,12 @@ def main() -> None:
         period_str=period_str,
         sheets_url=history_url,
         capacity_data=capacity_data,
+        alloc_data=_config.get("acid_allocation"),
+        oprate_data=_config.get("operating_rates"),
+        margin_data=_config.get("margin_tracker"),
+        export_data=_config.get("export_restrictions"),
+        outage_data=_config.get("unplanned_outages"),
+        markets_data=_config.get("addressable_markets"),
     )
 
     logger.info("\n📁 СТЪПКА 5б: Качване в Google Drive...")
