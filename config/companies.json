@@ -158,6 +158,71 @@
         "INEOS pigments news",
         "INEOS TiO2 2026"
       ]
+    },
+    {
+      "name": "Guangdong Huiyun Titanium Industry",
+      "ticker": "300891",
+      "country": "CN",
+      "website": null,
+      "news_url": null,
+      "ir_url": null,
+      "exchange": "Shenzhen Stock Exchange (ChiNext)",
+      "listed": true,
+      "notes": "Основана 2003, IPO 2020. Седалище: Yunan, Guangdong.",
+      "keywords": [
+        "Huiyun Titanium",
+        "Guangdong Huiyun",
+        "Huiyun TiO2",
+        "300891 titanium"
+      ]
+    },
+    {
+      "name": "Shandong Jinhai Titanium Industry Resources Technology",
+      "ticker": null,
+      "country": "CN",
+      "website": null,
+      "news_url": null,
+      "ir_url": null,
+      "listed": false,
+      "owner": "Shandong Lubei Enterprise Group (държавна)",
+      "notes": "Държавна дъщерна компания. Капацитет ~260 000 т/год.",
+      "keywords": [
+        "Jinhai Titanium",
+        "Shandong Jinhai",
+        "Jinhai TiO2"
+      ]
+    },
+    {
+      "name": "Anhui Annada Titanium Industry",
+      "ticker": "002136",
+      "country": "CN",
+      "website": "https://andty.com",
+      "news_url": null,
+      "ir_url": null,
+      "exchange": "Shenzhen Stock Exchange",
+      "listed": true,
+      "notes": "Основана 1987, листвана на SZSE от 2007. Седалище: Tongling, Anhui.",
+      "keywords": [
+        "Annada Titanium",
+        "Anhui Annada",
+        "Annada TiO2",
+        "002136 titanium"
+      ]
+    },
+    {
+      "name": "Lanxing Dahua",
+      "ticker": null,
+      "country": "CN",
+      "website": null,
+      "news_url": null,
+      "ir_url": null,
+      "listed": null,
+      "notes": "Ограничена публична информация — потвърдени само чрез LinkedIn поста от 14 септ. 2026.",
+      "keywords": [
+        "Lanxing Dahua",
+        "Lanxing Dahua TiO2",
+        "Lanxing Dahua titanium dioxide"
+      ]
     }
   ],
   "global_keywords": [
