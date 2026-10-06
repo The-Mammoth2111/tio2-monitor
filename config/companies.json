@@ -12,7 +12,8 @@
         "TROX",
         "Tronox TiO2",
         "Tronox titanium"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "Chemours",
@@ -26,7 +27,8 @@
         "Ti-Pure",
         "Chemours TiO2",
         "Chemours titanium dioxide"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "Kronos Worldwide",
@@ -40,7 +42,8 @@
         "KRO",
         "Kronos TiO2",
         "Kronos titanium"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "LB Group (Lomon Billions / ex-Henan Billions)",
@@ -60,7 +63,8 @@
       ],
       "exchange": "Shenzhen Stock Exchange",
       "listed": true,
-      "notes": "Създадена 2016: сливане на Henan Billions + Sichuan Lomon. Ребранд на Lomon Billions → LB Group юли 2021. Придоби Venator Greatham (UK) април 2026 → нова дъщерна Tioxide."
+      "notes": "Създадена 2016: сливане на Henan Billions + Sichuan Lomon. Ребранд на Lomon Billions → LB Group юли 2021. Придоби Venator Greatham (UK) април 2026 → нова дъщерна Tioxide.",
+      "publicly_traded": true
     },
     {
       "name": "Jinan Yuxing Chemical",
@@ -74,7 +78,8 @@
         "Yuxing TiO2",
         "Yuxing titanium dioxide",
         "R818 TiO2"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "Shandong Doguide Group",
@@ -88,7 +93,8 @@
         "Doguide TiO2",
         "Doguide titanium",
         "SR-240 TiO2"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "Grupa Azoty Police (TYTANPOL)",
@@ -104,7 +110,8 @@
         "Police TiO2",
         "Zakłady Chemiczne Police",
         "PCE Warsaw"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "Precheza (PRETIOX)",
@@ -121,7 +128,8 @@
         "PRETIOX titanium dioxide",
         "Precheza Přerov",
         "Precheza pigment"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "Indorama Advanced Oxides (Huelva)",
@@ -139,7 +147,8 @@
         "Indorama Advanced Oxides",
         "Indorama Huelva titanium dioxide",
         "Indorama Venator Spain"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "INEOS Pigments (Ashtabula)",
@@ -157,7 +166,8 @@
         "INEOS titanium dioxide Ashtabula",
         "INEOS pigments news",
         "INEOS TiO2 2026"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "Guangdong Huiyun Titanium Industry",
@@ -174,7 +184,8 @@
         "Guangdong Huiyun",
         "Huiyun TiO2",
         "300891 titanium"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "Shandong Jinhai Titanium Industry Resources Technology",
@@ -190,7 +201,8 @@
         "Jinhai Titanium",
         "Shandong Jinhai",
         "Jinhai TiO2"
-      ]
+      ],
+      "publicly_traded": false
     },
     {
       "name": "Anhui Annada Titanium Industry",
@@ -207,7 +219,8 @@
         "Anhui Annada",
         "Annada TiO2",
         "002136 titanium"
-      ]
+      ],
+      "publicly_traded": true
     },
     {
       "name": "Lanxing Dahua",
@@ -222,7 +235,8 @@
         "Lanxing Dahua",
         "Lanxing Dahua TiO2",
         "Lanxing Dahua titanium dioxide"
-      ]
+      ],
+      "publicly_traded": false
     }
   ],
   "global_keywords": [
@@ -935,5 +949,40 @@
         "impact": "—"
       }
     ]
+  },
+  "earnings_tracking": {
+    "description": "Track quarterly/annual SEC filings (10-Q, 10-K, 8-K earnings releases) and equivalent disclosures for publicly traded companies in the companies list. For each publicly traded company, search for and summarize: revenue (quarterly + YoY/QoQ %), net income/loss, Adjusted EBITDA + margin, segment breakdown (TiO2 vs other), capex, guidance/outlook changes, and major one-off items (restructuring, tax items, plant closures).",
+    "applies_to": "companies where publicly_traded == true",
+    "sources": [
+      "SEC EDGAR (sec.gov)",
+      "company investor relations pages",
+      "PRNewswire/BusinessWire earnings releases"
+    ],
+    "frequency": "check each report run; most companies report quarterly (roughly late Jan/Apr/Jul/Oct for calendar-Q reporters)"
+  },
+  "analyst_coverage": {
+    "description": "Track equity analyst ratings, price targets, and rating changes (upgrades/downgrades) from major investment banks for all publicly traded companies in the companies list.",
+    "applies_to": "companies where publicly_traded == true",
+    "banks_to_track": [
+      "Goldman Sachs",
+      "Morgan Stanley",
+      "JPMorgan",
+      "Truist Securities",
+      "Citi",
+      "Bank of America",
+      "Wells Fargo",
+      "UBS",
+      "Barclays",
+      "Deutsche Bank"
+    ],
+    "capture_fields": [
+      "bank",
+      "date",
+      "rating (buy/hold/sell/equivalent)",
+      "price_target",
+      "prior_rating_or_target (if changed)",
+      "rationale_summary"
+    ],
+    "notes": "Chinese A-share listed companies (LB Group, Huiyun, Annada) will mainly have coverage from domestic Chinese brokerages (e.g., CITIC, Guotai Junan, Huatai) rather than the Western banks above; track those too when found."
   }
 }
