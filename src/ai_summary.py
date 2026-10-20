@@ -11,7 +11,7 @@ import anthropic
 logger = logging.getLogger(__name__)
 
 MODEL = "claude-sonnet-4-6"
-MAX_TOKENS = 2000
+MAX_TOKENS = 4000
 
 
 def _build_articles_text(articles: list[dict]) -> str:
@@ -45,7 +45,7 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
 
     prompt = f"""Ти си TiO2 (титанов диоксид) пазарен анализатор. Получаваш списък с новини от седмицата {period_str}.
 
-Производителите, които следим: Tronox, Chemours, Kronos Worldwide, LB Group (Lomon Billions), Jinan Yuxing, Henan Billions, Shandong Doguide.
+Производителите, които следим: Tronox (TROX), Chemours (CC), Kronos Worldwide (KRO), LB Group / Lomon Billions (002601.SZ), Grupa Azoty Police (PCE.WSE), Guangdong Huiyun (300891.SZ), Anhui Annada (002136.SZ), Jinan Yuxing, Shandong Doguide, Precheza, Indorama Huelva, INEOS Pigments, Shandong Jinhai, Lanxing Dahua.
 
 НОВИНИ:
 {articles_text}
@@ -57,6 +57,12 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
     "Тенденция 1 на Български",
     "Тенденция 2 на Български",
     "Тенденция 3 на Български"
+  ],
+  "analyst_actions": [
+    {{"date": "YYYY-MM-DD", "bank": "Goldman Sachs", "company": "Tronox", "action": "понижение / повишение / потвърждава / започва покритие / сваля целта", "rating": "Sell", "price_target": "$4.00", "prior": "$6.50", "rationale": "кратко на Български"}}
+  ],
+  "earnings": [
+    {{"company": "Chemours", "period": "Q3 2026", "status": "отчетен / предстои", "date": "YYYY-MM-DD", "highlights": "приходи, печалба, Adj. EBITDA, насоки — на Български"}}
   ],
   "article_scores": [
     {{"index": 1, "importance": 5, "reason": "кратко обяснение на Български"}},
@@ -95,6 +101,10 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
 
 Ако има новини за ТЪРГОВСКИ РАЗСЛЕДВАНИЯ — разграничи ФАЗАТА: инициирано разследване (ранен сигнал, движи пазара месеци преди решението) vs предварителни мита vs финални мита vs преглед. Инициирането е най-ценната информация, защото дава време за реакция.
 
+🏦 АНАЛИЗАТОРИ (тип "Анализатори"): извлечи ВСЯКО действие на банка или брокер (рейтинг, целева цена, повишение/понижение, започнато покритие) в "analyst_actions". Само реални действия от статиите — НЕ измисляй банки, цели или дати. Ако предишната цел не е посочена, остави "prior" празно. В executive_summary коментирай ПОСОКАТА: преобладават ли понижения или повишения и какво казва това за сектора. Понижение или започнато покритие от голяма банка = важност 4-5.
+
+📑 ФИНАНСОВИ ОТЧЕТИ (тип "Отчети"): за всяка борсова компания попълни "earnings" — или резултатите, ако отчетът е излязъл (приходи и % г/г, нетна печалба/загуба, Adj. EBITDA и марж, TiO₂ сегмент, насоки, еднократни позиции), или датата на предстоящия отчет. Публикуван отчет = важност 5. Промяна в насоките = важност 5. Ако няма информация за компания, не я включвай.
+
 Оценки за важност:
 5 = Критично важно (голяма ценова промяна, регулация, фалит, придобиване, скок в цената на сярата)
 4 = Важно (финансови резултати, значителна новина)
@@ -130,6 +140,8 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
         return {
             "executive_summary": result.get("executive_summary", ""),
             "key_trends": result.get("key_trends", []),
+            "analyst_actions": result.get("analyst_actions", []),
+            "earnings": result.get("earnings", []),
             "articles_with_importance": articles_enriched,
         }
 
@@ -149,5 +161,7 @@ def _fallback_summary(articles: list[dict], period_str: str) -> dict:
     return {
         "executive_summary": f"Автоматичното AI резюме не беше генерирано за периода {period_str}. Намерени са {len(articles)} статии.",
         "key_trends": [],
+        "analyst_actions": [],
+        "earnings": [],
         "articles_with_importance": articles,
     }

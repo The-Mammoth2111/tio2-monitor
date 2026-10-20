@@ -13,7 +13,8 @@
         "Tronox TiO2",
         "Tronox titanium"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Tronox"
     },
     {
       "name": "Chemours",
@@ -28,7 +29,8 @@
         "Chemours TiO2",
         "Chemours titanium dioxide"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Chemours"
     },
     {
       "name": "Kronos Worldwide",
@@ -43,7 +45,8 @@
         "Kronos TiO2",
         "Kronos titanium"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Kronos Worldwide"
     },
     {
       "name": "LB Group (Lomon Billions / ex-Henan Billions)",
@@ -64,7 +67,9 @@
       "exchange": "Shenzhen Stock Exchange",
       "listed": true,
       "notes": "Създадена 2016: сливане на Henan Billions + Sichuan Lomon. Ребранд на Lomon Billions → LB Group юли 2021. Придоби Venator Greatham (UK) април 2026 → нова дъщерна Tioxide.",
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "LB Group Lomon Billions",
+      "name_cn": "龙佰集团"
     },
     {
       "name": "Jinan Yuxing Chemical",
@@ -111,7 +116,8 @@
         "Zakłady Chemiczne Police",
         "PCE Warsaw"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Grupa Azoty Police"
     },
     {
       "name": "Precheza (PRETIOX)",
@@ -185,7 +191,9 @@
         "Huiyun TiO2",
         "300891 titanium"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Huiyun Titanium",
+      "name_cn": "惠云钛业"
     },
     {
       "name": "Shandong Jinhai Titanium Industry Resources Technology",
@@ -220,7 +228,9 @@
         "Annada TiO2",
         "002136 titanium"
       ],
-      "publicly_traded": true
+      "publicly_traded": true,
+      "search_name": "Annada Titanium",
+      "name_cn": "安纳达"
     },
     {
       "name": "Lanxing Dahua",
@@ -958,7 +968,16 @@
       "company investor relations pages",
       "PRNewswire/BusinessWire earnings releases"
     ],
-    "frequency": "check each report run; most companies report quarterly (roughly late Jan/Apr/Jul/Oct for calendar-Q reporters)"
+    "frequency": "check each report run; most companies report quarterly (roughly late Jan/Apr/Jul/Oct for calendar-Q reporters)",
+    "query_templates": [
+      "{name} quarterly results",
+      "{name} earnings release date",
+      "{name} {ticker} revenue EBITDA guidance"
+    ],
+    "query_templates_cn": [
+      "{name_cn} 季度报告 业绩",
+      "{name_cn} 净利润"
+    ]
   },
   "analyst_coverage": {
     "description": "Track equity analyst ratings, price targets, and rating changes (upgrades/downgrades) from major investment banks for all publicly traded companies in the companies list.",
@@ -973,7 +992,12 @@
       "Wells Fargo",
       "UBS",
       "Barclays",
-      "Deutsche Bank"
+      "Deutsche Bank",
+      "Mizuho",
+      "RBC Capital Markets",
+      "BMO Capital Markets",
+      "Zacks Research",
+      "Alembic Global"
     ],
     "capture_fields": [
       "bank",
@@ -983,6 +1007,22 @@
       "prior_rating_or_target (if changed)",
       "rationale_summary"
     ],
-    "notes": "Chinese A-share listed companies (LB Group, Huiyun, Annada) will mainly have coverage from domestic Chinese brokerages (e.g., CITIC, Guotai Junan, Huatai) rather than the Western banks above; track those too when found."
+    "notes": "Chinese A-share listed companies (LB Group, Huiyun, Annada) will mainly have coverage from domestic Chinese brokerages (e.g., CITIC, Guotai Junan, Huatai) rather than the Western banks above; track those too when found.",
+    "chinese_brokers_to_track": [
+      "CITIC Securities (中信证券)",
+      "CSC Securities (中信建投)",
+      "Guotai Junan (国泰君安)",
+      "Huatai Securities (华泰证券)",
+      "Zhongyou Securities (中邮证券)"
+    ],
+    "query_templates": [
+      "{name} price target",
+      "{name} analyst upgrade downgrade",
+      "{name} {ticker} rating {bank}"
+    ],
+    "query_templates_cn": [
+      "{name_cn} 研报 评级",
+      "{name_cn} 目标价"
+    ]
   }
 }

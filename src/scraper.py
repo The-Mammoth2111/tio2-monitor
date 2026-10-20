@@ -88,11 +88,21 @@ def make_article(title: str, url: str, summary: str, source: str,
 # 1. Google News RSS
 # ─────────────────────────────────────────────
 
+GOOGLE_NEWS_LOCALES = {
+    "en": "hl=en-US&gl=US&ceid=US:en",
+    "zh": "hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+}
+
+
 def fetch_google_news(query: str, company_name: str, article_type: str,
-                      days_back: int) -> list[dict]:
-    """Търси в Google News по ключова дума и връща списък статии."""
-    base_url = "https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
-    url = base_url.format(query=quote_plus(query))
+                      days_back: int, lang: str = "en") -> list[dict]:
+    """Търси в Google News по ключова дума и връща списък статии.
+
+    lang: "en" (по подразбиране) или "zh" — за китайски брокерски доклади
+    и отчети на A-share компаниите.
+    """
+    locale = GOOGLE_NEWS_LOCALES.get(lang, GOOGLE_NEWS_LOCALES["en"])
+    url = f"https://news.google.com/rss/search?q={quote_plus(query)}&{locale}"
     articles = []
     try:
         feed = feedparser.parse(url)
@@ -351,6 +361,14 @@ def scrape_all(days_back: int = 7) -> list[dict]:
     # ── 10. Непланирани прекъсвания ──
     logger.info("📡 Force majeure, стачки, аварии...")
     all_articles.extend(fetch_unplanned_outages(config, days_back))
+
+    # ── 11. Финансови отчети (publicly_traded) ──
+    logger.info("📡 Тримесечни отчети на борсовите компании...")
+    all_articles.extend(fetch_earnings(config, days_back))
+
+    # ── 12. Анализаторско покритие (банки) ──
+    logger.info("📡 Рейтинги и целеви цени от банките...")
+    all_articles.extend(fetch_analyst_coverage(config, days_back))
 
     logger.info(f"✅ Общо събрани: {len(all_articles)} статии")
     return all_articles
@@ -679,4 +697,83 @@ def fetch_unplanned_outages(config: dict, days_back: int) -> list[dict]:
         time.sleep(0.3)
 
     logger.info(f"  Прекъсвания: {len(articles)} статии")
+    return articles
+
+
+# ── 11–12. ОТЧЕТИ И АНАЛИЗАТОРИ (само publicly_traded) ──
+
+def _public_companies(config: dict) -> list[dict]:
+    """Компаниите с publicly_traded == true."""
+    return [c for c in config.get("companies", []) if c.get("publicly_traded")]
+
+
+def _fill_template(template: str, company: dict, bank: str = "") -> str:
+    """Попълва {name}, {name_cn}, {ticker}, {bank} в шаблон за търсене."""
+    return template.format(
+        name=company.get("search_name") or company["name"].split(" (")[0],
+        name_cn=company.get("name_cn", ""),
+        ticker=company.get("ticker") or "",
+        bank=bank,
+    ).strip()
+
+
+def _run_section_queries(section: dict, company: dict, label: str,
+                         article_type: str, days_back: int,
+                         banks: list[str] | None = None) -> list[dict]:
+    """Изпълнява английските и (ако има name_cn) китайските шаблони за една компания."""
+    articles = []
+    for tpl in section.get("query_templates", []):
+        if "{bank}" in tpl:
+            # Шаблонът с банка се пуска само за западните (не-CN) компании,
+            # иначе броят заявки експлодира без полза.
+            if company.get("country") == "CN":
+                continue
+            for bank in banks or []:
+                q = _fill_template(tpl, company, bank)
+                articles.extend(fetch_google_news(q, label, article_type, days_back))
+                time.sleep(0.3)
+        else:
+            q = _fill_template(tpl, company)
+            articles.extend(fetch_google_news(q, label, article_type, days_back))
+            time.sleep(0.3)
+    if company.get("name_cn"):
+        for tpl in section.get("query_templates_cn", []):
+            q = _fill_template(tpl, company)
+            articles.extend(fetch_google_news(q, label, article_type, days_back, lang="zh"))
+            time.sleep(0.3)
+    return articles
+
+
+def fetch_earnings(config: dict, days_back: int) -> list[dict]:
+    """
+    Тримесечни/годишни отчети (10-Q, 10-K, 8-K и китайските еквиваленти)
+    за всички компании с publicly_traded == true.
+
+    Тип "Отчети" — AI резюмето извлича приходи, печалба, Adj. EBITDA,
+    насоки и дати на следващите отчети.
+    """
+    section = config.get("earnings_tracking", {})
+    articles = []
+    for company in _public_companies(config):
+        articles.extend(_run_section_queries(
+            section, company, company["name"], "Отчети", days_back))
+    logger.info(f"  Отчети: {len(articles)} статии")
+    return articles
+
+
+def fetch_analyst_coverage(config: dict, days_back: int) -> list[dict]:
+    """
+    Рейтинги, целеви цени и повишения/понижения от банките в
+    analyst_coverage.banks_to_track (+ китайски брокери за A-share).
+
+    Тип "Анализатори" — AI резюмето ги превръща в таблица
+    (банка, дата, компания, рейтинг, цел, предишна цел, обосновка).
+    """
+    section = config.get("analyst_coverage", {})
+    banks = section.get("banks_to_track", [])
+    articles = []
+    for company in _public_companies(config):
+        articles.extend(_run_section_queries(
+            section, company, company["name"], "Анализатори", days_back, banks))
+    logger.info(f"  Анализатори: {len(articles)} статии")
     return articles

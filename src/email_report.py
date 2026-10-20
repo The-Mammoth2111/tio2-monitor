@@ -52,9 +52,73 @@ def _type_badge(article_type: str) -> str:
         "Маржове":     ("badge-margin","Маржове"),
         "ЕкспОгр":     ("badge-exp",   "Експорт огр."),
         "Прекъсвания": ("badge-outage","Прекъсване"),
+        "Отчети":      ("badge-earn",  "Отчет"),
+        "Анализатори": ("badge-analyst","Анализатори"),
     }
     cls, label = colors.get(article_type, ("badge-news", article_type))
     return f'<span class="badge {cls}">{label}</span>'
+
+
+
+def _esc(v) -> str:
+    """Минимално HTML escaping за стойности от AI/статии."""
+    return (str(v or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _render_analyst_actions(actions: list[dict], articles: list[dict]) -> str:
+    """Таблица с действията на банките + до 6 изходни статии."""
+    if not actions and not articles:
+        return ""
+    html = ('<p style="font-size:11.5px;color:#581c87;margin-bottom:10px;">🏦 Рейтинги и целеви цени '
+            'за борсовите производители. Посоката (повече понижения или повишения) е сигнал '
+            'за очакванията на пазара за сектора.</p>')
+    if actions:
+        html += ('<table class="an-table"><tr><th>Дата</th><th>Банка</th><th>Компания</th>'
+                 '<th>Действие</th><th>Рейтинг</th><th>Цел</th><th>Предишна</th></tr>')
+        for a in sorted(actions, key=lambda x: str(x.get("date", "")), reverse=True):
+            act = _esc(a.get("action"))
+            low = act.lower()
+            cls = "an-down" if ("пониж" in low or "сваля" in low) else ("an-up" if "повиш" in low else "")
+            html += (f'<tr><td>{_esc(a.get("date"))}</td><td>{_esc(a.get("bank"))}</td>'
+                     f'<td>{_esc(a.get("company"))}</td><td class="{cls}">{act}</td>'
+                     f'<td>{_esc(a.get("rating"))}</td><td><strong>{_esc(a.get("price_target"))}</strong></td>'
+                     f'<td>{_esc(a.get("prior"))}</td></tr>')
+            if a.get("rationale"):
+                html += f'<tr><td></td><td colspan="6"><small>➜ {_esc(a.get("rationale"))}</small></td></tr>'
+        html += '</table>'
+    for art in articles[:6]:
+        html += f"""
+        <div class="comm-item"><div>🏦</div><div class="comm-text">
+          <strong>{_esc(art.get('title',''))}</strong><br>
+          <small>{_esc(art.get('company',''))}</small><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {_esc(art.get('source',''))}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+    return html
+
+
+def _render_earnings(earnings: list[dict], articles: list[dict]) -> str:
+    """Таблица с отчетите/датите + до 6 изходни статии."""
+    if not earnings and not articles:
+        return ""
+    html = ""
+    if earnings:
+        html += ('<table class="an-table"><tr><th>Компания</th><th>Период</th><th>Статус</th>'
+                 '<th>Дата</th><th>Ключови числа / насоки</th></tr>')
+        for e in earnings:
+            html += (f'<tr><td><strong>{_esc(e.get("company"))}</strong></td><td>{_esc(e.get("period"))}</td>'
+                     f'<td>{_esc(e.get("status"))}</td><td>{_esc(e.get("date"))}</td>'
+                     f'<td>{_esc(e.get("highlights"))}</td></tr>')
+        html += '</table>'
+    for art in articles[:6]:
+        html += f"""
+        <div class="comm-item"><div>📑</div><div class="comm-text">
+          <strong>{_esc(art.get('title',''))}</strong><br>
+          <small>{_esc(art.get('company',''))}</small><br>
+          <a class="news-link" href="{art.get('url','#')}" target="_blank">🔗 {_esc(art.get('source',''))}</a>
+          <span class="news-date">{art.get('date','')}</span>
+        </div></div>"""
+    return html
 
 
 def _articles_by_company(articles: list[dict]) -> dict:
@@ -136,7 +200,10 @@ def build_html_email(articles: list[dict], summary_data: dict,
     trends_html = "".join(f"<li>{t}</li>" for t in key_trends) if key_trends else ""
 
     # Компании секции (без ОБЩИ)
-    grouped = _articles_by_company(articles)
+    # Отчетите и анализаторите имат свои секции — не ги дублираме в „По компании“
+    grouped = _articles_by_company(
+        [a for a in articles if a.get('type') not in ('Отчети', 'Анализатори')]
+    )
     company_order = [
         "Tronox", "Chemours", "Kronos Worldwide",
         "LB Group (Lomon Billions)", "Jinan Yuxing Chemical",
@@ -150,7 +217,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
     for company, arts in grouped.items():
         if company not in company_order and company != "ОБЩИ" and arts:
             # Пропускаме суровини и макро — те имат свои секции
-            if all(a.get('type') in ('Суровини', 'Макро', 'Валути', 'Енергия', 'Търсене', 'Логистика', 'Капацитет', 'Разследвания', 'Алокация', 'ОперНива', 'Маржове', 'ЕкспОгр', 'Прекъсвания') for a in arts):
+            if all(a.get('type') in ('Суровини', 'Макро', 'Валути', 'Енергия', 'Търсене', 'Логистика', 'Капацитет', 'Разследвания', 'Алокация', 'ОперНива', 'Маржове', 'ЕкспОгр', 'Прекъсвания', 'Отчети', 'Анализатори') for a in arts):
                 continue
             companies_html += _render_company_section(company, arts)
 
@@ -441,6 +508,18 @@ def build_html_email(articles: list[dict], summary_data: dict,
           <span class="news-date">{art.get('date','')}</span>
         </div></div>"""
 
+    # ── Финансови отчети (earnings_tracking) ──
+    earnings_html = _render_earnings(
+        summary_data.get("earnings", []),
+        [a for a in articles if a.get('type') == 'Отчети'],
+    )
+
+    # ── Анализаторско покритие (analyst_coverage) ──
+    analyst_html = _render_analyst_actions(
+        summary_data.get("analyst_actions", []),
+        [a for a in articles if a.get('type') == 'Анализатори'],
+    )
+
     # Регулаторни (от ОБЩИ или с тип Регулаторни)
     reg_articles = [a for a in articles if a.get('type') == 'Регулаторни']
     reg_html = ""
@@ -543,6 +622,13 @@ def build_html_email(articles: list[dict], summary_data: dict,
   .margin-box {{ background: #fff7ed; border: 2px solid #ea580c; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; text-align: center; }}
   .margin-num {{ font-size: 26px; font-weight: 800; color: #dc2626; font-family: monospace; }}
   .margin-lbl {{ font-size: 11px; color: #7c2d12; margin-top: 4px; }}
+  .badge-earn   {{ background: #bae6fd; color: #075985; }}
+  .badge-analyst {{ background: #e9d5ff; color: #581c87; }}
+  .an-table {{ width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }}
+  .an-table th {{ background: #1e293b; color: #cbd5e1; padding: 6px 8px; text-align: left; font-size: 10px; text-transform: uppercase; }}
+  .an-table td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }}
+  .an-table td.an-down {{ color: #dc2626; font-weight: 700; }}
+  .an-table td.an-up   {{ color: #16a34a; font-weight: 700; }}
   .mkt-table {{ width: 100%; border-collapse: collapse; font-size: 11px; }}
   .mkt-table th {{ background: #0f2444; color: #cbd5e1; padding: 6px 8px; text-align: left; font-size: 9.5px; text-transform: uppercase; }}
   .mkt-table td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; }}
@@ -606,6 +692,10 @@ def build_html_email(articles: list[dict], summary_data: dict,
     <div class="section-title">🏭 По компании</div>
     {companies_html if companies_html else '<p style="color:#94a3b8;font-size:13px;">Няма новини по компании за тази седмица.</p>'}
   </div>
+
+  {"<div class='section'><div class='section-title'>📑 Финансови отчети — борсови компании</div>" + earnings_html + "</div>" if earnings_html else ""}
+
+  {"<div class='section'><div class='section-title'>🏦 Банки и анализатори — рейтинги и целеви цени</div>" + analyst_html + "</div>" if analyst_html else ""}
 
   {"<div class='section'><div class='section-title'>⚖️ Регулаторни промени</div>" + reg_html + "</div>" if reg_html else ""}
 
