@@ -121,6 +121,69 @@ def _render_earnings(earnings: list[dict], articles: list[dict]) -> str:
     return html
 
 
+
+# ─── Статистика и „остарели“ данни ─────────────────────────────
+
+REGULATORY_TYPES = ("Регулаторни", "Разследвания")
+FINANCIAL_TYPES = ("Финансови", "Отчети")
+STALE_AFTER_DAYS = 30
+
+
+def report_stats(articles: list[dict], config: dict | None) -> dict:
+    """
+    Една функция за числата в имейла и в Архива, за да не се разминават.
+      companies  — само реални компании от config["companies"], не етикети на раздели
+      regulatory — регулаторни новини + търговски разследвания
+      financial  — финансови новини + тримесечни отчети
+    """
+    names = {c["name"] for c in (config or {}).get("companies", [])}
+    present = {a.get("company") for a in articles}
+    companies = len(present & names) if names else len(present - {"ОБЩИ", ""})
+    return {
+        "articles": len(articles),
+        "companies": companies,
+        "regulatory": sum(1 for a in articles if a.get("type") in REGULATORY_TYPES),
+        "financial": sum(1 for a in articles if a.get("type") in FINANCIAL_TYPES),
+    }
+
+
+def _stale_note(section: dict | None, today: datetime | None = None) -> str:
+    """
+    Ако таблицата от конфигурацията има data_as_of по-старо от STALE_AFTER_DAYS
+    (или stale_after_days от самата секция) — сив етикет, че може да е остаряла.
+    """
+    if not section or not section.get("data_as_of"):
+        return ""
+    raw = str(section["data_as_of"])
+    for fmt in ("%Y-%m-%d", "%Y-%m"):
+        try:
+            as_of = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            as_of = None
+    if not as_of:
+        return ""
+    limit = int(section.get("stale_after_days", STALE_AFTER_DAYS))
+    age = ((today or datetime.now()) - as_of).days
+    if age <= limit:
+        return ""
+    return (f'<p class="stale-note">⏳ Статични данни от конфигурацията към <strong>{raw}</strong> '
+            f'(преди {age} дни) — може да са остарели; провери новините по-долу.</p>')
+
+
+
+def _market_class(status: str) -> str:
+    """Цвят по статус: в процес (жълто) → блокиран (червено) → отворен (зелено)."""
+    s = status.lower()
+    if any(k in s for k in ("разследване", "предварителн", "препоръ", "чака", "отложен")):
+        return "mkt-pending"
+    if any(k in s for k in ("пауз", "суспенд", "отворен", "наситен")):
+        return "mkt-open"
+    if any(k in s for k in ("мита", "мито", "в сила", "финални", "активен")):
+        return "mkt-blocked"
+    return "mkt-open"
+
+
 def _articles_by_company(articles: list[dict]) -> dict:
     """Групира статии по компания."""
     grouped = defaultdict(list)
@@ -182,7 +245,8 @@ def build_html_email(articles: list[dict], summary_data: dict,
                       margin_data: dict | None = None,
                       export_data: dict | None = None,
                       outage_data: dict | None = None,
-                      markets_data: dict | None = None) -> str:
+                      markets_data: dict | None = None,
+                      config: dict | None = None) -> str:
     """
     Изгражда пълния HTML email от динамичните данни.
     Връща HTML string готов за изпращане.
@@ -190,9 +254,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
     now_str = datetime.now().strftime("%d %b %Y, %H:%M UTC")
 
     # Статистики
-    companies_set = {a['company'] for a in articles if a.get('company') not in ('ОБЩИ', '')}
-    reg_count = sum(1 for a in articles if a.get('type') == 'Регулаторни')
-    fin_count = sum(1 for a in articles if a.get('type') == 'Финансови')
+    stats = report_stats(articles, config)
 
     # AI резюме
     executive_summary = summary_data.get("executive_summary", "")
@@ -204,11 +266,8 @@ def build_html_email(articles: list[dict], summary_data: dict,
     grouped = _articles_by_company(
         [a for a in articles if a.get('type') not in ('Отчети', 'Анализатори')]
     )
-    company_order = [
-        "Tronox", "Chemours", "Kronos Worldwide",
-        "LB Group (Lomon Billions)", "Jinan Yuxing Chemical",
-        "Henan Billions Chemicals", "Shandong Doguide Group",
-    ]
+    # Редът и имената идват от конфигурацията (един източник на истината)
+    company_order = [c["name"] for c in (config or {}).get("companies", [])]
     companies_html = ""
     for company in company_order:
         if company in grouped and grouped[company]:
@@ -310,7 +369,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
     # ── Алокация H₂SO₄ ──
     alloc_articles = [a for a in articles if a.get('type') == 'Алокация']
-    alloc_html = ""
+    alloc_html = _stale_note(alloc_data)
     if alloc_data:
         s = alloc_data.get("consumption_split_china", {})
         alloc_html += f"""
@@ -337,7 +396,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
     # ── Оперативни нива + Маржове ──
     oprate_articles = [a for a in articles if a.get('type') in ('ОперНива', 'Маржове')]
-    oprate_html = ""
+    oprate_html = _stale_note(oprate_data) or _stale_note(margin_data)
     if oprate_data:
         hist = oprate_data.get("historical", [])
         oprate_html += '<div class="oprate-box"><div style="font-size:11px;font-weight:700;color:#312e81;">Натоварване на китайските TiO₂ заводи</div><div class="oprate-chart">'
@@ -365,7 +424,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
     # ── Прекъсвания ──
     outage_articles = [a for a in articles if a.get('type') == 'Прекъсвания']
-    outage_html = ""
+    outage_html = _stale_note(outage_data)
     if outage_articles or outage_data:
         outage_html += '<p style="font-size:11.5px;color:#7f1d1d;margin-bottom:10px;">⛔ <strong>Движат спот-цените ВЕДНАГА</strong> — за разлика от обявените затваряния, които се очакват предварително.</p>'
     for e in (outage_data or {}).get("recent_events", []):
@@ -385,7 +444,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
     # ── Експортни ограничения ──
     exp_articles = [a for a in articles if a.get('type') == 'ЕкспОгр']
-    export_html = ""
+    export_html = _stale_note(export_data)
     if export_data:
         export_html += '<p style="font-size:11.5px;color:#4c1d95;margin-bottom:10px;">🚫 <strong>Различен механизъм от антидъмпинга.</strong> Експортният контрол върху СУРОВИНА засяга производството навсякъде, докато вносните мита защитават конкретен пазар.</p>'
         for r in export_data.get("active", []):
@@ -404,25 +463,25 @@ def build_html_email(articles: list[dict], summary_data: dict,
         </div></div>"""
 
     # ── Адресируеми пазари ──
-    markets_html = ""
+    markets_html = _stale_note(markets_data)
     if markets_data:
         markets_html += '<p style="font-size:11.5px;color:#334155;margin-bottom:10px;">🌍 Показва <strong>накъде се пренасочват китайските обеми</strong> при всяко ново мито и кои пазари се насищат.</p>'
         markets_html += '<table class="mkt-table"><tr><th>Регион</th><th>Размер</th><th>Статус за китайски внос</th></tr>'
         for m in markets_data.get("regions", []):
             st = m["china_status"]
-            cls = "mkt-blocked" if "Мита" in st or "мито" in st else ("mkt-pending" if "Разследване" in st else "mkt-open")
-            markets_html += f'<tr><td><strong>{m["region"]}</strong></td><td>{m["size_kmt"]} кт</td><td class="{cls}">{st}</td></tr>'
+            cls = _market_class(st)
+            markets_html += f'<tr><td><strong>{m["region"]}</strong></td><td>{str(m["size_kmt"]) + " кт" if m.get("size_kmt") else "—"}</td><td class="{cls}">{st}</td></tr>'
         markets_html += '</table>'
         markets_html += '<p style="font-size:10.5px;color:#64748b;margin:12px 0 6px;font-weight:700;">Търговски бариери по юрисдикция:</p>'
         markets_html += '<table class="mkt-table"><tr><th>Юрисдикция</th><th>Мита</th><th>Статус</th><th>Ефект</th></tr>'
         for b in markets_data.get("trade_barriers_summary", []):
-            cls = "mkt-pending" if "РАЗСЛЕДВАНЕ" in b["status"] else ("mkt-open" if "ПАУЗИРАН" in b["status"] else "mkt-blocked")
+            cls = _market_class(b["status"])
             markets_html += f'<tr><td>{b["jurisdiction"]}</td><td>{b["duties"]}</td><td class="{cls}">{b["status"]}</td><td>{b["impact"]}</td></tr>'
         markets_html += '</table>'
 
     # ── Капацитет ──
     cap_articles = [a for a in articles if a.get('type') == 'Капацитет']
-    capacity_html = ""
+    capacity_html = _stale_note(capacity_data)
     if capacity_data:
         offline = capacity_data.get("offline_kt", 0)
         online = capacity_data.get("online_kt", 0)
@@ -538,6 +597,11 @@ def build_html_email(articles: list[dict], summary_data: dict,
           </div>
         </div>"""
 
+    footer_companies = " · ".join(
+        c.get("search_name") or c["name"].split(" (")[0]
+        for c in (config or {}).get("companies", [])
+    ) or "TiO₂ производители"
+
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -629,12 +693,13 @@ def build_html_email(articles: list[dict], summary_data: dict,
   .an-table td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }}
   .an-table td.an-down {{ color: #dc2626; font-weight: 700; }}
   .an-table td.an-up   {{ color: #16a34a; font-weight: 700; }}
+  .stale-note {{ font-size: 10.5px; color: #64748b; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px; }}
   .mkt-table {{ width: 100%; border-collapse: collapse; font-size: 11px; }}
   .mkt-table th {{ background: #0f2444; color: #cbd5e1; padding: 6px 8px; text-align: left; font-size: 9.5px; text-transform: uppercase; }}
   .mkt-table td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #334155; }}
-  .mkt-blocked {{ color: #dc2626; font-weight: 600; }}
-  .mkt-open {{ color: #16a34a; font-weight: 600; }}
-  .mkt-pending {{ color: #d97706; font-weight: 600; }}
+  .mkt-table td.mkt-blocked {{ color: #dc2626; font-weight: 600; }}
+  .mkt-table td.mkt-open {{ color: #16a34a; font-weight: 600; }}
+  .mkt-table td.mkt-pending {{ color: #d97706; font-weight: 600; }}
   .exp-item {{ display: flex; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #faf5ff; border-left: 3px solid #7c3aed; border-radius: 0 6px 6px 0; font-size: 12.5px; color: #4c1d95; line-height: 1.5; }}
   .outage-item {{ display: flex; gap: 8px; margin-bottom: 8px; padding: 10px 12px; background: #fef2f2; border-left: 3px solid #dc2626; border-radius: 0 6px 6px 0; font-size: 12.5px; color: #7f1d1d; line-height: 1.5; }}
   .news-item {{ display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid #e9edf2; font-size: 12.5px; }}
@@ -663,10 +728,10 @@ def build_html_email(articles: list[dict], summary_data: dict,
     <div class="period">📅 Период: {period_str}</div>
   </div>
   <div class="meta">
-    <span>🏭 {len(companies_set)} Компании</span>
-    <span>📰 {len(articles)} Статии</span>
-    <span>⚖️ {reg_count} Регулаторни</span>
-    <span>💰 {fin_count} Финансови</span>
+    <span>🏭 {stats['companies']} Компании</span>
+    <span>📰 {stats['articles']} Статии</span>
+    <span>⚖️ {stats['regulatory']} Регулаторни</span>
+    <span>💰 {stats['financial']} Финансови</span>
     <span>⏱ {now_str}</span>
   </div>
 
@@ -681,10 +746,10 @@ def build_html_email(articles: list[dict], summary_data: dict,
   <div class="section">
     <div class="section-title">📊 Статистика</div>
     <div class="stats">
-      <div class="stat"><div class="stat-num">{len(articles)}</div><div class="stat-label">Статии</div></div>
-      <div class="stat"><div class="stat-num">{len(companies_set)}</div><div class="stat-label">Компании</div></div>
-      <div class="stat"><div class="stat-num">{reg_count}</div><div class="stat-label">Регулаторни</div></div>
-      <div class="stat"><div class="stat-num">{fin_count}</div><div class="stat-label">Финансови</div></div>
+      <div class="stat"><div class="stat-num">{stats['articles']}</div><div class="stat-label">Статии</div></div>
+      <div class="stat"><div class="stat-num">{stats['companies']}</div><div class="stat-label">Компании</div></div>
+      <div class="stat"><div class="stat-num">{stats['regulatory']}</div><div class="stat-label">Регулаторни и разследвания</div></div>
+      <div class="stat"><div class="stat-num">{stats['financial']}</div><div class="stat-label">Финансови и отчети</div></div>
     </div>
   </div>
 
@@ -733,7 +798,7 @@ def build_html_email(articles: list[dict], summary_data: dict,
 
   <div class="footer">
     TiO₂ Market Intelligence Monitor · Claude AI<br>
-    Tronox · Kronos · Chemours · LB Group · Jinan Yuxing · Henan Billions · Shandong Doguide
+    {footer_companies}
   </div>
 </div>
 </body>
@@ -743,6 +808,11 @@ def build_html_email(articles: list[dict], summary_data: dict,
 # ─────────────────────────────────────────────
 # ИЗПРАЩАНЕ НА EMAIL
 # ─────────────────────────────────────────────
+
+def parse_recipients(value: str) -> list[str]:
+    """„a@x.bg, b@x.bg; c@x.bg“ → ['a@x.bg', 'b@x.bg', 'c@x.bg']"""
+    return [r.strip() for r in value.replace(";", ",").split(",") if r.strip()]
+
 
 def send_email(html_content: str, subject: str, recipient: str) -> None:
     """
@@ -760,7 +830,10 @@ def send_email(html_content: str, subject: str, recipient: str) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = sender
-    msg["To"] = recipient
+    recipients = parse_recipients(recipient)
+    if not recipients:
+        raise ValueError("RECIPIENT_EMAIL е празен!")
+    msg["To"] = ", ".join(recipients)
 
     # Plain text fallback
     plain_text = f"TiO2 Monitor — {subject}\n\nОтвори HTML версията в email клиента си."
@@ -770,8 +843,8 @@ def send_email(html_content: str, subject: str, recipient: str) -> None:
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(sender, password)
-            server.sendmail(sender, recipient, msg.as_string())
-        logger.info(f"✅ Email изпратен до {recipient}")
+            server.sendmail(sender, recipients, msg.as_string())
+        logger.info(f"✅ Email изпратен до {', '.join(recipients)}")
     except Exception as e:
         logger.error(f"❌ Грешка при изпращане на email: {e}")
         raise

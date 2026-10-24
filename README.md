@@ -17,10 +17,30 @@
 
 ---
 
-## 🏭 Следени компании (11)
+## 🏭 Следени компании (14)
 
-| Компания | Марка | Борса | Държава |
-|---|---|---|---|
+Пълният списък е в `config/companies.json` — той е единственият източник; докладът подрежда компаниите оттам.
+
+| Компания | Борса | Държава |
+|---|---|---|
+| Tronox | NYSE: TROX 📈 | 🇺🇸 |
+| Chemours (Ti-Pure®) | NYSE: CC 📈 | 🇺🇸 |
+| Kronos Worldwide | NYSE: KRO 📈 | 🇺🇸 |
+| LB Group / Lomon Billions (ex-Henan Billions) | SZSE: 002601 📈 | 🇨🇳 |
+| Jinan Yuxing Chemical | Частна 🔒 | 🇨🇳 |
+| Shandong Doguide Group | Частна 🔒 | 🇨🇳 |
+| Grupa Azoty Police (TYTANPOL®) | WSE: PCE 📈 | 🇵🇱 |
+| Precheza (PRETIOX®) | Частна 🔒 (Agrofert) | 🇨🇿 |
+| Indorama Advanced Oxides (Huelva) | Частна 🔒 | 🇪🇸 |
+| INEOS Pigments (Ashtabula) | Частна 🔒 | 🇺🇸 |
+| Guangdong Huiyun Titanium | SZSE: 300891 📈 | 🇨🇳 |
+| Shandong Jinhai Titanium | Частна 🔒 | 🇨🇳 |
+| Anhui Annada Titanium | SZSE: 002136 📈 | 🇨🇳 |
+| Lanxing Dahua | Частна 🔒 | 🇨🇳 |
+
+За 📈 компаниите се следят и **тримесечни отчети** (`earnings_tracking`) и **рейтинги/целеви цени от банките** (`analyst_coverage`).
+
+---|---|---|---|
 | Tronox | — | NYSE: TROX 📈 | 🇺🇸 |
 | Chemours | Ti-Pure® | NYSE: CC 📈 | 🇺🇸 |
 | Kronos Worldwide | KRONOS® | NYSE: KRO 📈 | 🇺🇸 |
@@ -131,26 +151,33 @@ pip install -r requirements.txt
 
 **Settings → Secrets and variables → Actions → New repository secret**
 
-```
-ANTHROPIC_API_KEY
-GMAIL_USER
-GMAIL_APP_PASSWORD
-RECIPIENT_EMAIL
-GOOGLE_CREDENTIALS_JSON
-SHEETS_HISTORY_ID
-SHEETS_ARCHIVE_ID
-```
+| Secret | Стойност |
+|---|---|
+| `ANTHROPIC_API_KEY` | ключ от console.anthropic.com |
+| `GMAIL_USER` | Gmail адресът, от който се изпраща |
+| `GMAIL_APP_PASSWORD` | App Password (не обикновената парола) |
+| `RECIPIENT_EMAIL` | един или няколко адреса, разделени със запетая |
+| `GOOGLE_CREDENTIALS_JSON` | целият JSON на service account-а |
+| `SHEETS_HISTORY_ID` | `1hIS_KRRCTVzA-g-KeBM2dnSWlwPnWMMw3l2YW2tPF60` |
+| `SHEETS_ARCHIVE_ID` | `1jMDLrPRZgTG_O6CwdoX8EP5ev52bUrbTWeW9MYKAvdM` |
+
+Двата Sheets трябва да са споделени (Editor) с имейла на service account-а (`...@...iam.gserviceaccount.com`).
+
+По избор, в **Variables** (не Secrets): `ANTHROPIC_MODEL` — сменя модела на Claude без промяна в кода (по подразбиране `claude-sonnet-5-5`).
 
 ---
 
 ## 🔄 Стартиране
 
-**Автоматично:** Всеки понеделник 07:00 UTC (= 10:00 ч. BG)
+**Автоматично:** всеки понеделник 07:00 UTC (= 10:00 ч. BG) — винаги истинско пускане.
 
-**Ръчно от GitHub:**
-1. Actions таб
-2. TiO2 Monitor — Седмичен доклад
-3. Run workflow → Run workflow
+**Ръчно от GitHub:** Actions → *TiO2 Monitor — Седмичен доклад* → **Run workflow**.
+- `dry_run = true` (по подразбиране): **пробно пускане** — събира новините и прави доклада, но не пише в Sheets/Drive и не изпраща имейл. Не изисква secrets.
+- `dry_run = false`: истинско пускане.
+
+Докладът (`report.html`) и логът (`tio2_monitor.log`) се пазят 30 дни: Actions → пускането → **Artifacts**.
+
+Ако липсва настройка, логът казва точно коя и откъде се взима.
 
 ---
 
@@ -160,7 +187,11 @@ SHEETS_ARCHIVE_ID
 `Дата | Компания | Тип | Заглавие | Резюме | Извор | URL | AI Важност (1-5) | AI Причина`
 
 ### Google Sheets — Архив
-Един ред на седмица с AI резюме и линкове към HTML доклада.
+Един ред на седмица с AI резюме и линкове към HTML доклада. Колоните се подреждат според заглавния ред на таблицата.
+
+### Статични таблици в конфигурацията
+Секциите с фонови данни (натоварване, маржове, капацитет, прекъсвания, пазари…) имат поле `data_as_of`.
+Ако датата е по-стара от 30 дни, докладът показва сив етикет „може да са остарели“. Обнови данните и датата в `config/companies.json`.
 
 ---
 

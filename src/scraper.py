@@ -271,9 +271,11 @@ def scrape_all(days_back: int = 7) -> list[dict]:
             all_articles.extend(arts)
             time.sleep(0.5)
 
-        # Yahoo Finance (само за публично търгуваните)
-        if company.get('ticker'):
-            arts = fetch_yahoo_finance_news(company['ticker'], name, days_back)
+        # Yahoo Finance (само за публично търгуваните).
+        # yahoo_ticker е с борсовия суфикс (002601.SZ, PCE.WA); без него Yahoo не намира нищо.
+        yahoo_ticker = company.get('yahoo_ticker') or (company.get('ticker') if company.get('country') == 'US' else None)
+        if yahoo_ticker:
+            arts = fetch_yahoo_finance_news(yahoo_ticker, name, days_back)
             all_articles.extend(arts)
             time.sleep(0.5)
 
@@ -561,6 +563,7 @@ def get_capacity_balance(config: dict) -> dict:
         "online_kt": online,
         "net_kt": online - offline,
         "events": events,
+        "data_as_of": config.get("capacity_tracker", {}).get("data_as_of"),
     }
 
 

@@ -5,13 +5,18 @@ on:
     # Всеки понеделник в 07:00 UTC (= 10:00 ч. българско лятно време)
     - cron: '0 7 * * 1'
 
-  # Позволява и ръчно стартиране от GitHub UI
+  # Ръчно стартиране от GitHub UI (Actions → TiO2 Monitor → Run workflow)
   workflow_dispatch:
     inputs:
       days_back:
         description: 'Брой дни назад за търсене (по подразбиране 7)'
         required: false
         default: '7'
+      dry_run:
+        description: 'Пробно пускане: без Sheets, Drive и имейл; не изисква secrets'
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   run-monitor:
@@ -39,6 +44,7 @@ jobs:
       - name: 🔬 Run TiO2 Monitor
         env:
           ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL:          ${{ vars.ANTHROPIC_MODEL }}
           GMAIL_USER:               ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD:       ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL:          ${{ secrets.RECIPIENT_EMAIL }}
@@ -46,13 +52,18 @@ jobs:
           SHEETS_HISTORY_ID:        ${{ secrets.SHEETS_HISTORY_ID }}
           SHEETS_ARCHIVE_ID:        ${{ secrets.SHEETS_ARCHIVE_ID }}
           DAYS_BACK:                ${{ github.event.inputs.days_back || '7' }}
+          # Ръчно пускане: по избор (по подразбиране пробно). По график: винаги истинско.
+          DRY_RUN:                  ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' && '1' || '' }}
         run: python src/main.py
 
-      # 5. При грешка — запазваме лога
-      - name: 📋 Upload log on failure
-        if: failure()
+      # 5. Пазим доклада и лога при всяко пускане (Actions → пускането → Artifacts)
+      - name: 📄 Upload report and log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: error-log-${{ github.run_id }}
-          path: '*.log'
-          retention-days: 7
+          name: tio2-report-${{ github.run_id }}
+          path: |
+            report.html
+            tio2_monitor.log
+          if-no-files-found: ignore
+          retention-days: 30

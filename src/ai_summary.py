@@ -10,7 +10,8 @@ import anthropic
 
 logger = logging.getLogger(__name__)
 
-MODEL = "claude-sonnet-4-6"
+# Моделът може да се смени без промяна в кода: GitHub secret/variable ANTHROPIC_MODEL
+MODEL = os.environ.get("ANTHROPIC_MODEL", "").strip() or "claude-sonnet-5-5"
 MAX_TOKENS = 4000
 
 
@@ -40,7 +41,11 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
             "articles_with_importance": [],
         }
 
-    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    if not api_key:
+        logger.warning("⚠️  Няма ANTHROPIC_API_KEY — резервно резюме без AI")
+        return _fallback_summary(articles, period_str, reason="няма зададен ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=api_key)
     articles_text = _build_articles_text(articles)
 
     prompt = f"""Ти си TiO2 (титанов диоксид) пазарен анализатор. Получаваш списък с новини от седмицата {period_str}.
@@ -147,19 +152,21 @@ def generate_summary(articles: list[dict], period_str: str) -> dict:
 
     except json.JSONDecodeError as e:
         logger.error(f"❌ Грешка при парсиране на AI отговор: {e}")
-        return _fallback_summary(articles, period_str)
+        return _fallback_summary(articles, period_str, reason="AI отговорът не беше валиден JSON")
     except Exception as e:
-        logger.error(f"❌ Claude API грешка: {e}")
-        return _fallback_summary(articles, period_str)
+        logger.error(f"❌ Claude API грешка (модел {MODEL}): {e}")
+        return _fallback_summary(articles, period_str, reason=f"грешка от Claude API ({type(e).__name__}) с модел {MODEL}")
 
 
-def _fallback_summary(articles: list[dict], period_str: str) -> dict:
+def _fallback_summary(articles: list[dict], period_str: str, reason: str = "") -> dict:
     """Fallback при грешка с API — без AI резюме."""
     for art in articles:
         art['ai_importance'] = 3
         art['ai_reason'] = ''
     return {
-        "executive_summary": f"Автоматичното AI резюме не беше генерирано за периода {period_str}. Намерени са {len(articles)} статии.",
+        "executive_summary": (f"⚠️ AI резюмето не беше генерирано за периода {period_str}"
+                              + (f" — причина: {reason}" if reason else "")
+                              + f". Намерени са {len(articles)} статии; виж ги по раздели по-долу."),
         "key_trends": [],
         "analyst_actions": [],
         "earnings": [],

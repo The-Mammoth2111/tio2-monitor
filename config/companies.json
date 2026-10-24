@@ -69,7 +69,8 @@
       "notes": "Създадена 2016: сливане на Henan Billions + Sichuan Lomon. Ребранд на Lomon Billions → LB Group юли 2021. Придоби Venator Greatham (UK) април 2026 → нова дъщерна Tioxide.",
       "publicly_traded": true,
       "search_name": "LB Group Lomon Billions",
-      "name_cn": "龙佰集团"
+      "name_cn": "龙佰集团",
+      "yahoo_ticker": "002601.SZ"
     },
     {
       "name": "Jinan Yuxing Chemical",
@@ -117,7 +118,8 @@
         "PCE Warsaw"
       ],
       "publicly_traded": true,
-      "search_name": "Grupa Azoty Police"
+      "search_name": "Grupa Azoty Police",
+      "yahoo_ticker": "PCE.WA"
     },
     {
       "name": "Precheza (PRETIOX)",
@@ -193,7 +195,8 @@
       ],
       "publicly_traded": true,
       "search_name": "Huiyun Titanium",
-      "name_cn": "惠云钛业"
+      "name_cn": "惠云钛业",
+      "yahoo_ticker": "300891.SZ"
     },
     {
       "name": "Shandong Jinhai Titanium Industry Resources Technology",
@@ -230,7 +233,8 @@
       ],
       "publicly_traded": true,
       "search_name": "Annada Titanium",
-      "name_cn": "安纳达"
+      "name_cn": "安纳达",
+      "yahoo_ticker": "002136.SZ"
     },
     {
       "name": "Lanxing Dahua",
@@ -656,7 +660,8 @@
         "date": "2025-09",
         "process": "sulphate"
       }
-    ]
+    ],
+    "data_as_of": "2026-07-29"
   },
   "trade_investigations": {
     "relevance": "ИНИЦИИРАНЕТО на разследване движи пазара месеци преди решението. Ранен сигнал за реакция при договаряне.",
@@ -721,7 +726,9 @@
       "fertilizer priority sulfuric acid allocation",
       "H2SO4 availability chemical industry 2026",
       "sulfuric acid rationing"
-    ]
+    ],
+    "data_as_of": "2026-07-29",
+    "stale_after_days": 365
   },
   "operating_rates": {
     "priority": "ВИСОК — опреждащ индикатор за предлагането",
@@ -763,7 +770,8 @@
       "titanium dioxide capacity utilization China",
       "Chinese TiO2 production run rate",
       "TiO2 plant utilization rate"
-    ]
+    ],
+    "data_as_of": "2026-04"
   },
   "margin_tracker": {
     "priority": "ВИСОК — количествено измерва издръжливостта",
@@ -798,7 +806,8 @@
       "titanium dioxide production cost China",
       "TiO2 cash cost margin squeeze",
       "SCI99 TiO2 price index"
-    ]
+    ],
+    "data_as_of": "2026-04-20"
   },
   "export_restrictions": {
     "priority": "ВИСОК — механизъм, различен от антидъмпинга",
@@ -829,7 +838,8 @@
       "China export restriction chemicals fertilizer",
       "export control sulphuric acid",
       "China export quota chemicals 2026"
-    ]
+    ],
+    "data_as_of": "2026-07-29"
   },
   "unplanned_outages": {
     "priority": "ВИСОК — движи спот-цените веднага",
@@ -866,7 +876,8 @@
       "TiO2 unplanned outage supply",
       "pigment plant shutdown unplanned",
       "TiO2 industrial action strike"
-    ]
+    ],
+    "data_as_of": "2026-07-29"
   },
   "addressable_markets": {
     "priority": "СРЕДЕН — референтна таблица за пренасочване на обеми",
@@ -876,7 +887,7 @@
       {
         "region": "Европа",
         "size_kmt": 1000,
-        "china_status": "Мита в сила ($290-860/mt, мин. 5 г.) — внос ↓~50%"
+        "china_status": "Мита в сила ($290-860/mt, мин. 5 г.) — внос ↓~50%; абсорбционно преразследване от 25 авг. 2026"
       },
       {
         "region": "Северна Америка",
@@ -896,7 +907,7 @@
       {
         "region": "Великобритания",
         "size_kmt": 90,
-        "china_status": "Разследване инициирано 3 март 2026"
+        "china_status": "Предварителна препоръка за мита 48–64% (TRA, 7 окт. 2026); коментари до 26 окт."
       },
       {
         "region": "Африка",
@@ -906,14 +917,24 @@
       {
         "region": "Австралия",
         "size_kmt": 46,
-        "china_status": "Разследване инициирано 30 април 2026"
+        "china_status": "Разследване (дело 699) — решението отложено до юни 2027"
+      },
+      {
+        "region": "Япония",
+        "size_kmt": null,
+        "china_status": "Разследване инициирано 16 окт. 2026 (рутилен TiO₂); решение до ~1 година"
+      },
+      {
+        "region": "Индия",
+        "size_kmt": null,
+        "china_status": "DGTR препоръча мита $460-681/т (авг. 2026) — чака нотификация"
       }
     ],
     "trade_barriers_summary": [
       {
         "jurisdiction": "ЕС",
         "duties": "$290-860/mt",
-        "status": "В сила мин. 5 г.",
+        "status": "В сила мин. 5 г.; абсорбционно преразследване от 25 авг. 2026",
         "impact": "Внос ↓~50%"
       },
       {
@@ -930,9 +951,9 @@
       },
       {
         "jurisdiction": "Индия",
-        "duties": "20-30% ($460-680/mt) + 10% данък",
-        "status": "ПАУЗИРАНИ от 8 дек 2025",
-        "impact": "Внос ↓60% Q1/Q2"
+        "duties": "$460-681/т (препоръка)",
+        "status": "ПРЕПОРЪКА на DGTR (авг. 2026) — чака нотификация",
+        "impact": "Очаква се"
       },
       {
         "jurisdiction": "Саудитска Арабия",
@@ -942,23 +963,30 @@
       },
       {
         "jurisdiction": "Великобритания",
-        "duties": "—",
-        "status": "РАЗСЛЕДВАНЕ от 3 март 2026",
-        "impact": "Очаква се"
+        "duties": "48.29–63.66% (мин. £0.665–0.876/кг)",
+        "status": "ПРЕДВАРИТЕЛНА препоръка 7 окт. 2026",
+        "impact": "Финално решение след 26 окт."
       },
       {
         "jurisdiction": "Австралия",
         "duties": "—",
-        "status": "РАЗСЛЕДВАНЕ от 30 април 2026",
+        "status": "РАЗСЛЕДВАНЕ (дело 699), отложено до юни 2027",
         "impact": "Очаква се"
       },
       {
         "jurisdiction": "Евразийски икон. съюз",
         "duties": "—",
-        "status": "Активен",
+        "status": "Мита суспендирани до 10 авг. 2027",
         "impact": "—"
+      },
+      {
+        "jurisdiction": "Япония",
+        "duties": "—",
+        "status": "РАЗСЛЕДВАНЕ от 16 окт. 2026",
+        "impact": "Решение до ~окт. 2027"
       }
-    ]
+    ],
+    "data_as_of": "2026-10-24"
   },
   "earnings_tracking": {
     "description": "Track quarterly/annual SEC filings (10-Q, 10-K, 8-K earnings releases) and equivalent disclosures for publicly traded companies in the companies list. For each publicly traded company, search for and summarize: revenue (quarterly + YoY/QoQ %), net income/loss, Adjusted EBITDA + margin, segment breakdown (TiO2 vs other), capex, guidance/outlook changes, and major one-off items (restructuring, tax items, plant closures).",

@@ -27,14 +27,13 @@ HISTORY_HEADERS = [
     "Резюме", "Извор", "URL", "AI Важност (1-5)", "AI Причина"
 ]
 
-# Колони за "Архив" Sheet
+# Колони за "Архив" Sheet — както са в реалната таблица (10 колони).
+# Ако таблицата е празна, кодът създава точно тези заглавия.
 ARCHIVE_HEADERS = [
     "Дата на генериране", "Период от", "Период до",
     "Брой статии", "Брой компании", "Регулаторни", "Финансови",
-    "AI Резюме", "Ключови тенденции",
-    "Линк към HTML доклад", "Линк към Sheets данни"
+    "AI Резюме", "Линк към пълен доклад (HTML)", "Линк към данни (Sheets)",
 ]
-
 
 def get_gspread_client() -> gspread.Client:
     """Създава авторизиран gspread клиент от Service Account JSON."""
@@ -103,11 +102,43 @@ def append_articles(articles: list[dict], sheet_id: str) -> None:
         raise
 
 
-def append_archive_row(articles: list[dict], summary_data: dict,
-                        period_str: str, drive_url: str,
-                        sheets_history_url: str, archive_sheet_id: str) -> None:
+def _archive_value(header: str, values: dict) -> str:
     """
-    Добавя един обобщен ред в „Архив на Доклади" Sheet-а.
+    Намира стойността за дадено заглавие по ключови думи, а не по позиция —
+    така редът пасва на таблицата, дори ако колоните са пренаредени или
+    има допълнителни (напр. „Ключови тенденции“).
+    """
+    h = header.strip().lower()
+    rules = [
+        (("генериран",), "generated"),
+        (("период от", "от"), "period_from"),
+        (("период до", "до"), "period_to"),
+        (("статии",), "articles"),
+        (("компании",), "companies"),
+        (("регулатор",), "regulatory"),
+        (("финанс",), "financial"),
+        (("резюме",), "summary"),
+        (("тенденц",), "trends"),
+        (("html", "доклад"), "drive_url"),
+        (("данни", "sheets", "история"), "history_url"),
+    ]
+    for keys, field in rules:
+        # „от“/„до“ се търсят само като цели думи, за да не съвпаднат с „доклад“
+        if field in ("period_from", "period_to"):
+            if keys[0] in h or h.split()[-1:] == [keys[1]]:
+                return values[field]
+            continue
+        if any(k in h for k in keys):
+            return values[field]
+    return ""
+
+
+def append_archive_row(summary_data: dict, stats: dict, period: dict,
+                       drive_url: str, sheets_history_url: str,
+                       archive_sheet_id: str) -> None:
+    """
+    Добавя един обобщен ред в Архива. Подрежда стойностите според
+    заглавния ред на таблицата.
     """
     client = get_gspread_client()
     try:
@@ -118,35 +149,25 @@ def append_archive_row(articles: list[dict], summary_data: dict,
             ws = sh.get_worksheet(0)
 
         ensure_headers(ws, ARCHIVE_HEADERS)
+        headers = ws.row_values(1) or ARCHIVE_HEADERS
 
-        # Статистики
-        today = datetime.now().strftime("%Y-%m-%d")
-        parts = period_str.split("–")
-        period_from = parts[0].strip() if len(parts) > 0 else today
-        period_to = parts[1].strip() if len(parts) > 1 else today
-
-        companies_set = {a['company'] for a in articles if a.get('company') != 'ОБЩИ'}
-        regulatory_count = sum(1 for a in articles if a.get('type') == 'Регулаторни')
-        financial_count = sum(1 for a in articles if a.get('type') == 'Финансови')
-
-        trends_text = " | ".join(summary_data.get("key_trends", []))
-
-        row = [
-            today,
-            period_from,
-            period_to,
-            len(articles),
-            len(companies_set),
-            regulatory_count,
-            financial_count,
-            summary_data.get("executive_summary", "")[:1000],
-            trends_text[:500],
-            drive_url,
-            sheets_history_url,
-        ]
+        values = {
+            "generated": datetime.now().strftime("%Y-%m-%d"),
+            "period_from": period["start"],
+            "period_to": period["end"],
+            "articles": stats["articles"],
+            "companies": stats["companies"],
+            "regulatory": stats["regulatory"],
+            "financial": stats["financial"],
+            "summary": summary_data.get("executive_summary", "")[:1000],
+            "trends": " | ".join(summary_data.get("key_trends", []))[:500],
+            "drive_url": drive_url,
+            "history_url": sheets_history_url,
+        }
+        row = [_archive_value(h, values) for h in headers]
 
         ws.append_row(row, value_input_option="USER_ENTERED")
-        logger.info(f"✅ Записан ред в Архив Sheet ({today})")
+        logger.info(f"✅ Записан ред в Архив Sheet ({values['generated']}, {len(row)} колони)")
 
     except Exception as e:
         logger.error(f"❌ Грешка при запис в Архив Sheet: {e}")
