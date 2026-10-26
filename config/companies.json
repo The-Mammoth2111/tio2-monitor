@@ -927,7 +927,7 @@
       {
         "region": "Индия",
         "size_kmt": null,
-        "china_status": "DGTR препоръча мита $460-681/т (авг. 2026) — чака нотификация"
+        "china_status": "Мита в сила $460-681/т от 24 окт. 2026 (5 г.; LB Group $460)"
       }
     ],
     "trade_barriers_summary": [
@@ -951,9 +951,9 @@
       },
       {
         "jurisdiction": "Индия",
-        "duties": "$460-681/т (препоръка)",
-        "status": "ПРЕПОРЪКА на DGTR (авг. 2026) — чака нотификация",
-        "impact": "Очаква се"
+        "duties": "$460-681/т",
+        "status": "В сила от 24 окт. 2026, 5 г.",
+        "impact": "Китайският износ (~13,5%) се пренасочва"
       },
       {
         "jurisdiction": "Саудитска Арабия",
@@ -986,7 +986,7 @@
         "impact": "Решение до ~окт. 2027"
       }
     ],
-    "data_as_of": "2026-10-24"
+    "data_as_of": "2026-10-26"
   },
   "earnings_tracking": {
     "description": "Track quarterly/annual SEC filings (10-Q, 10-K, 8-K earnings releases) and equivalent disclosures for publicly traded companies in the companies list. For each publicly traded company, search for and summarize: revenue (quarterly + YoY/QoQ %), net income/loss, Adjusted EBITDA + margin, segment breakdown (TiO2 vs other), capex, guidance/outlook changes, and major one-off items (restructuring, tax items, plant closures).",
